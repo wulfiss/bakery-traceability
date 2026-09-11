@@ -1,8 +1,24 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import type { PageData } from './$types';
+	import type { SubmitFunction } from '@sveltejs/kit';
+	import type { ActionData, PageData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
+
+	// Disable the INICIAR button while the action is in flight so a double tap
+	// cannot fire two starts. This SvelteKit build's `enhance` action only
+	// accepts a submit callback (no `in`/`disable` transition hook), so the
+	// guard lives here and the default enhanced behavior is restored with
+	// `update()`.
+	const preventDoubleStart: SubmitFunction = ({ formElement }) => {
+		const buttons = Array.from(formElement.querySelectorAll('button'));
+		for (const button of buttons) button.disabled = true;
+		return ({ update }) => {
+			for (const button of buttons) button.disabled = false;
+			return update();
+		};
+	};
 
 	const shiftLabels: Record<string, string> = {
 		morning: 'MAÑANA',
@@ -23,6 +39,20 @@
 	{:else}
 		<h1>Producción de hoy</h1>
 
+		{#if form?.error}
+			<div class="error" role="alert">
+				<p>{form.error}</p>
+				{#if form.missingLots && form.missingLots.length > 0}
+					<p class="error-sub">Falta lote activo:</p>
+					<ul>
+						{#each form.missingLots as name (name)}
+							<li>- {name}</li>
+						{/each}
+					</ul>
+				{/if}
+			</div>
+		{/if}
+
 		<div class="shift-line">
 			<span>Turno: {shiftLabels[data.shift]}</span>
 			<form method="POST" action={resolve('/production?/change')}>
@@ -38,8 +68,20 @@
 				<ul class="items">
 					{#each data.base as item (item.id)}
 						<li class="item">
-							<span class="product">{item.productName}</span>
-							<span class="qty">{item.quantity} {item.unit}</span>
+							<span class="item-info">
+								<span class="product">{item.productName}</span>
+								<span class="qty">{item.quantity} {item.unit}</span>
+							</span>
+							{#if item.status === 'pending'}
+								<form
+									method="POST"
+									action={resolve('/production?/start')}
+									use:enhance={preventDoubleStart}
+								>
+									<input type="hidden" name="request_id" value={item.id} />
+									<button type="submit" class="start-btn">INICIAR</button>
+								</form>
+							{/if}
 						</li>
 					{/each}
 				</ul>
@@ -54,8 +96,20 @@
 				<ul class="items">
 					{#each data.external as item (item.id)}
 						<li class="item">
-							<span class="product">{item.productName}</span>
-							<span class="qty">{item.quantity} {item.unit}</span>
+							<span class="item-info">
+								<span class="product">{item.productName}</span>
+								<span class="qty">{item.quantity} {item.unit}</span>
+							</span>
+							{#if item.status === 'pending'}
+								<form
+									method="POST"
+									action={resolve('/production?/start')}
+									use:enhance={preventDoubleStart}
+								>
+									<input type="hidden" name="request_id" value={item.id} />
+									<button type="submit" class="start-btn">INICIAR</button>
+								</form>
+							{/if}
 						</li>
 					{/each}
 				</ul>
@@ -70,8 +124,20 @@
 				<ul class="items">
 					{#each data.additional as item (item.id)}
 						<li class="item">
-							<span class="product">{item.productName}</span>
-							<span class="qty">{item.quantity} {item.unit}</span>
+							<span class="item-info">
+								<span class="product">{item.productName}</span>
+								<span class="qty">{item.quantity} {item.unit}</span>
+							</span>
+							{#if item.status === 'pending'}
+								<form
+									method="POST"
+									action={resolve('/production?/start')}
+									use:enhance={preventDoubleStart}
+								>
+									<input type="hidden" name="request_id" value={item.id} />
+									<button type="submit" class="start-btn">INICIAR</button>
+								</form>
+							{/if}
 						</li>
 					{/each}
 				</ul>
@@ -175,6 +241,52 @@
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius);
 		padding: 12px 14px;
+	}
+
+	.item-info {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.start-btn {
+		min-height: var(--touch-min);
+		padding: 8px 16px;
+		font-size: 0.95rem;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+		color: var(--color-on-primary);
+		background: var(--color-primary);
+		border: none;
+		border-radius: var(--radius);
+		cursor: pointer;
+	}
+
+	.error {
+		color: var(--color-danger);
+		background: var(--color-surface);
+		border: 1px solid var(--color-danger);
+		border-radius: var(--radius);
+		padding: 12px 14px;
+		margin: 0 0 16px;
+		font-size: 0.95rem;
+	}
+
+	.error p {
+		margin: 0 0 4px;
+		font-weight: 700;
+	}
+
+	.error-sub {
+		font-weight: 700;
+		margin-bottom: 2px;
+	}
+
+	.error ul {
+		margin: 0;
+		padding-left: 18px;
 	}
 
 	.product {

@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { SHIFTS, SHIFT_COOKIE, type Shift } from '$lib/shifts';
 import type { Database } from '$lib/types/database.types';
@@ -9,7 +9,7 @@ const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 // inferred select type in this toolchain (see AGENTS.md).
 type ProductionRequestLite = Pick<
 	Database['public']['Tables']['production_requests']['Row'],
-	'id' | 'source_type' | 'product_id' | 'requested_quantity' | 'unit'
+	'id' | 'source_type' | 'product_id' | 'requested_quantity' | 'unit' | 'status'
 >;
 type ProductLite = Pick<Database['public']['Tables']['products']['Row'], 'id' | 'name'>;
 
@@ -18,6 +18,7 @@ export type RequestItem = {
 	productName: string;
 	quantity: number;
 	unit: string;
+	status: Database['public']['Tables']['production_requests']['Row']['status'];
 };
 
 export const load: PageServerLoad = async (event) => {
@@ -53,7 +54,7 @@ export const load: PageServerLoad = async (event) => {
 	if (shift) {
 		const requestsResult = await supabase
 			.from('production_requests')
-			.select('id, source_type, product_id, requested_quantity, unit')
+			.select('id, source_type, product_id, requested_quantity, unit, status')
 			.eq('production_day_id', productionDayId)
 			.eq('shift_code', shift);
 		if (requestsResult.error) throw requestsResult.error;
@@ -72,7 +73,8 @@ export const load: PageServerLoad = async (event) => {
 				id: request.id,
 				productName: productNames.get(request.product_id) ?? '—',
 				quantity: request.requested_quantity,
-				unit: request.unit
+				unit: request.unit,
+				status: request.status
 			};
 			if (request.source_type === 'base') base.push(item);
 			else if (request.source_type === 'external_order') external.push(item);
@@ -107,5 +109,67 @@ export const actions: Actions = {
 	change: async (event) => {
 		event.cookies.delete(SHIFT_COOKIE, { path: '/' });
 		redirect(303, '/production');
+	},
+
+	// Start the production batch for one pending request. All business rules
+	// (pending state, active recipe, current lots, safe batch code) live in the
+	// start_production_batch RPC; this action only maps its error tokens to
+	// Spanish user messages.
+	start: async (event) => {
+		const formData = await event.request.formData();
+		const requestId =
+			typeof formData.get('request_id') === 'string' ? (formData.get('request_id') as string) : '';
+
+		if (!requestId) {
+			return fail(400, { error: 'No se puede iniciar la elaboración.', missingLots: [] });
+		}
+
+		const result = await event.locals.supabase.rpc('start_production_batch', {
+			p_production_request_id: requestId
+		});
+		if (result.error) {
+			const message = result.error.message;
+			if (message.startsWith('missing_material_lot:')) {
+				const names = message
+					.slice('missing_material_lot:'.length)
+					.split(',')
+					.map((name: string) => name.trim())
+					.filter((name: string) => name !== '');
+				return fail(400, {
+					error: 'No se puede iniciar la elaboración.',
+					missingLots: names
+				});
+			}
+			return fail(400, { error: startErrorMessages(message), missingLots: [] });
+		}
+
+		const batch = result.data;
+		if (!batch?.batch_id) {
+			return fail(400, { error: 'No se puede iniciar la elaboración.', missingLots: [] });
+		}
+		redirect(303, `/production/${batch.batch_id}`);
 	}
 };
+
+// start_production_batch error tokens (English, developer-facing) to
+// user-facing Spanish messages.
+function startErrorMessages(message: string): string {
+	switch (message) {
+		case 'production_request_not_found':
+			return 'La producción no existe.';
+		case 'request_not_pending':
+			return 'La producción ya fue iniciada.';
+		case 'no_recipe':
+			return 'El producto no tiene receta.';
+		case 'no_active_version':
+			return 'El producto no tiene una versión de receta activa.';
+		case 'ambiguous_recipes':
+			return 'El producto tiene varias recetas con versión activa.';
+		case 'not_authenticated':
+			return 'No hay sesión iniciada.';
+		case 'no_active_profile':
+			return 'Tu perfil no está activo.';
+		default:
+			return 'No se puede iniciar la elaboración.';
+	}
+}
