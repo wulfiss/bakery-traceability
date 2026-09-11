@@ -924,6 +924,8 @@ export type Database = {
         }
         Returns: string
       }
+      ensure_production_day: { Args: never; Returns: string }
+      get_business_date: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

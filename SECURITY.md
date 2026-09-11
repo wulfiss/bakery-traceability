@@ -45,7 +45,7 @@ operations (SECURITY DEFINER RPCs), not browser table writes:
 | Area                | Controlled operation(s)                                         | Status                      |
 | ------------------- | --------------------------------------------------------------- | --------------------------- |
 | Business date       | `get_business_date()`                                           | created (X0)                |
-| Production day      | `ensure_production_day(...)`                                    | to be created (phase X)     |
+| Production day      | `ensure_production_day(...)`                                    | created (X1)                |
 | Material lot change | `change_current_material_lot(...)`                              | created (W2)                |
 | Batch lifecycle     | `start_production_batch(...)`, `complete_production_batch(...)` | to be created (later phase) |
 
@@ -59,9 +59,9 @@ Table mutation classification:
   `batch_materials`, `batch_outputs`, `batch_requests`, `parent_batch_inputs`,
   `production_batches` (once started), `recipe_versions`,
   `recipe_ingredients`, `recipe_products`, `recipe_product_inputs`.
-- **Controlled operational state**: `production_days`, `production_requests`,
-  `material_lots` (`is_current` switch only through
-  `change_current_material_lot`), `production_batches`.
+- **Controlled operational state**: `production_days` (creation only through
+  `ensure_production_day`), `production_requests`, `material_lots` (`is_current`
+  switch only through `change_current_material_lot`), `production_batches`.
 - **Master data** (admin UI in later phases; no browser write path today):
   `raw_materials`, `brands`, `raw_material_brands`, `products`, `recipes`,
   `production_plan_items`, `external_orders`, `external_order_items`.
@@ -79,7 +79,7 @@ Table mutation classification:
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit (U4, updated in W2 and X0)
+## Audit (U4, updated in W2, X0 and X1)
 
 Functions in schema `public` (current state):
 
@@ -88,6 +88,7 @@ Functions in schema `public` (current state):
 | `reject_parent_batch_self_reference()`                | BEFORE INSERT/UPDATE trigger guard on `parent_batch_inputs` (a batch cannot consume its own output)                          | INVOKER (deliberate: pure read-only guard)                                              | `postgres` (owner), `service_role` |
 | `change_current_material_lot(uuid, uuid, text, date)` | Controlled write RPC: atomically closes the prior current lot of a raw material and creates the new one (in_use, is_current) | DEFINER (deliberate: performs close/insert no app role may do; all auth checks in-body) | `authenticated` only               |
 | `get_business_date()`                                 | Read-only helper: current date in `America/Argentina/Cordoba`, single source for `production_date`                           | INVOKER (deliberate: no writes, no privilege escalation)                                | `authenticated` only               |
+| `ensure_production_day()`                             | Controlled write RPC: idempotently creates the current business production day (status open) or returns the existing one     | DEFINER (deliberate: performs the insert no app role may do; all auth checks in-body)   | `authenticated` only               |
 
 Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
 
