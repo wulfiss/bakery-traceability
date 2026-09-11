@@ -951,6 +951,7 @@ export type Database = {
         }
         Returns: string
       }
+      create_brand: { Args: { p_name: string }; Returns: string }
       create_external_order: {
         Args: {
           p_customer_name: string
@@ -979,6 +980,10 @@ export type Database = {
         Args: { p_production_day_id: string; p_shift_code: string }
         Returns: string
       }
+      set_brand_active: {
+        Args: { p_active: boolean; p_id: string }
+        Returns: string
+      }
       set_raw_material_active: {
         Args: { p_active: boolean; p_id: string }
         Returns: string
@@ -993,6 +998,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      update_brand: { Args: { p_id: string; p_name: string }; Returns: string }
       update_raw_material: {
         Args: { p_default_unit: string; p_id: string; p_name: string }
         Returns: string

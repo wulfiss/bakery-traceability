@@ -56,6 +56,7 @@ operations (SECURITY DEFINER RPCs), not browser table writes:
 | External orders       | `create_external_order(...)`                                                             | created (AK2) |
 | External order items  | `add_external_order_item(...)`                                                           | created (AK3) |
 | Raw materials (admin) | `create_raw_material(...)` / `update_raw_material(...)` / `set_raw_material_active(...)` | created (AL1) |
+| Brands (admin)        | `create_brand(...)` / `update_brand(...)` / `set_brand_active(...)`                      | created (AL2) |
 
 Until the remaining RPCs exist, the write paths are the controlled operations
 above plus the server-side (service role) path used by migrations and seed
@@ -70,9 +71,12 @@ Table mutation classification:
 - **Controlled operational state**: `production_days` (creation only through
   `ensure_production_day`), `production_requests`, `material_lots` (`is_current`
   switch only through `change_current_material_lot`), `production_batches`.
-- **Master data** (admin UI since AL1 for `raw_materials`; no browser write path
-  for the rest): `raw_materials` (admin-controlled create/edit/soft-deactivate
-  since AL1), `brands`, `raw_material_brands`, `products`, `recipes`,
+- **Master data** (admin UI since AL1 for `raw_materials` and AL2 for `brands`;
+  no browser write path for the rest): `raw_materials` (admin-controlled
+  create/edit/soft-deactivate since AL1), `brands` (admin-controlled
+  create/edit/soft-deactivate since AL2; names are NOT uniqueness-constrained —
+  the F2 spec requires only a non-empty name, so duplicate names are allowed),
+  `raw_material_brands`, `products`, `recipes`,
   `production_plan_items`. `external_orders` and `external_order_items` have
   controlled creation RPCs since AK2/AK3 (header + items; no editing/cancel yet).
 
@@ -89,7 +93,7 @@ Table mutation classification:
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit (U4, updated in W2, X0, X1, Y1, Z1, AB1, AD1, AF1, AI1, AK2, AK3 and AL1)
+## Audit (U4, updated in W2, X0, X1, Y1, Z1, AB1, AD1, AF1, AI1, AK2, AK3, AL1 and AL2)
 
 Functions in schema `public` (current state):
 
@@ -110,6 +114,9 @@ Functions in schema `public` (current state):
 | `create_raw_material(text, text)`                                                   | Controlled write RPC (admin master data): trims name/unit, rejects blanks (`invalid_name`, `invalid_unit`), case-insensitive name uniqueness (`raw_material_name_exists`); inserts `raw_materials`; admin-only in-body gate (`insufficient_role` for operator/supervisor)                                                                                                                                                                                                                                                    | DEFINER (deliberate: performs the raw_materials insert no app role may do; all auth checks in-body)                            | `authenticated` only               |
 | `update_raw_material(uuid, text, text)`                                             | Controlled write RPC (admin master data): material must exist (`raw_material_not_found`); trims name/unit, rejects blanks (`invalid_name`, `invalid_unit`); case-insensitive name uniqueness excluding the row itself (`raw_material_name_exists`); updates name/default_unit/updated_at; admin-only in-body gate (`insufficient_role`)                                                                                                                                                                                      | DEFINER (deliberate: performs the raw_materials update no app role may do; all auth checks in-body)                            | `authenticated` only               |
 | `set_raw_material_active(uuid, boolean)`                                            | Controlled write RPC (admin master data): material must exist (`raw_material_not_found`); soft toggle of `active` (deactivation sets `active = false`; never a physical delete, because `material_lots`, `batch_materials`, `raw_material_brands` and `recipe_ingredients` reference `raw_materials` with RESTRICT FKs); admin-only in-body gate (`insufficient_role`)                                                                                                                                                       | DEFINER (deliberate: performs the raw_materials update no app role may do; all auth checks in-body)                            | `authenticated` only               |
+| `create_brand(text)`                                                                | Controlled write RPC (admin master data): trims name, rejects blanks (`invalid_name`); inserts `brands`. Brand names are NOT uniqueness-constrained (the F2 spec requires only a non-empty name, unlike raw_materials) — duplicate names are allowed by design; admin-only in-body gate (`insufficient_role`)                                                                                                                                                                                                                | DEFINER (deliberate: performs the brands insert no app role may do; all auth checks in-body)                                   | `authenticated` only               |
+| `update_brand(uuid, text)`                                                          | Controlled write RPC (admin master data): brand must exist (`brand_not_found`); trims name, rejects blanks (`invalid_name`); updates name/updated_at; no uniqueness check (see `create_brand`); admin-only in-body gate (`insufficient_role`)                                                                                                                                                                                                                                                                                | DEFINER (deliberate: performs the brands update no app role may do; all auth checks in-body)                                   | `authenticated` only               |
+| `set_brand_active(uuid, boolean)`                                                   | Controlled write RPC (admin master data): brand must exist (`brand_not_found`); soft toggle of `active` (deactivation sets `active = false`; never a physical delete, because `material_lots` and `raw_material_brands` reference `brands` with RESTRICT FKs); admin-only in-body gate (`insufficient_role`)                                                                                                                                                                                                                 | DEFINER (deliberate: performs the brands update no app role may do; all auth checks in-body)                                   | `authenticated` only               |
 
 Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
 

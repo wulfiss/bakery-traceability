@@ -12,6 +12,9 @@
 		<li>
 			<a href={resolve('/admin/raw-materials')}>Materiales</a>
 		</li>
+		<li>
+			<a href={resolve('/admin/brands')}>Marcas</a>
+		</li>
 	</ul>
 </main>
 
