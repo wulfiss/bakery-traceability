@@ -82,7 +82,16 @@ export const load: PageServerLoad = async (event) => {
 		}
 	}
 
-	return { shift, base, external, additional };
+	// 8. AJ1: shift progress, computed in memory from the requests loaded
+	// above and never stored in the DB. "total" counts every request of the
+	// selected shift; "completed" counts those with status 'completed'.
+	const all = [...base, ...external, ...additional];
+	const progress = {
+		completed: all.filter((item) => item.status === 'completed').length,
+		total: all.length
+	};
+
+	return { shift, base, external, additional, progress };
 };
 
 export const actions: Actions = {

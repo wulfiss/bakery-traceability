@@ -46,6 +46,8 @@
 			</form>
 		</div>
 
+		<p class="progress">{data.progress.completed} / {data.progress.total} completadas</p>
+
 		<section class="section">
 			<h2>Producción base</h2>
 			{#if data.base.length === 0}
@@ -181,10 +183,16 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 8px;
-		margin-bottom: 20px;
+		margin-bottom: 8px;
 	}
 
 	.shift-line span {
+		font-weight: 700;
+	}
+
+	.progress {
+		margin: 0 0 20px;
+		font-size: 0.95rem;
 		font-weight: 700;
 	}
 
