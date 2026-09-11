@@ -1,24 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import type { SubmitFunction } from '@sveltejs/kit';
+	import { preventDoubleSubmit } from '$lib/forms';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
-
-	// Disable the INICIAR button while the action is in flight so a double tap
-	// cannot fire two starts. This SvelteKit build's `enhance` action only
-	// accepts a submit callback (no `in`/`disable` transition hook), so the
-	// guard lives here and the default enhanced behavior is restored with
-	// `update()`.
-	const preventDoubleStart: SubmitFunction = ({ formElement }) => {
-		const buttons = Array.from(formElement.querySelectorAll('button'));
-		for (const button of buttons) button.disabled = true;
-		return ({ update }) => {
-			for (const button of buttons) button.disabled = false;
-			return update();
-		};
-	};
 
 	const shiftLabels: Record<string, string> = {
 		morning: 'MAÑANA',
@@ -76,7 +62,7 @@
 								<form
 									method="POST"
 									action={resolve('/production?/start')}
-									use:enhance={preventDoubleStart}
+									use:enhance={preventDoubleSubmit}
 								>
 									<input type="hidden" name="request_id" value={item.id} />
 									<button type="submit" class="start-btn">INICIAR</button>
@@ -104,7 +90,7 @@
 								<form
 									method="POST"
 									action={resolve('/production?/start')}
-									use:enhance={preventDoubleStart}
+									use:enhance={preventDoubleSubmit}
 								>
 									<input type="hidden" name="request_id" value={item.id} />
 									<button type="submit" class="start-btn">INICIAR</button>
@@ -132,7 +118,7 @@
 								<form
 									method="POST"
 									action={resolve('/production?/start')}
-									use:enhance={preventDoubleStart}
+									use:enhance={preventDoubleSubmit}
 								>
 									<input type="hidden" name="request_id" value={item.id} />
 									<button type="submit" class="start-btn">INICIAR</button>

@@ -1,5 +1,5 @@
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { error, fail, redirect } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
 import type { Database } from '$lib/types/database.types';
 
 // Explicit row annotations: supabase-js 2.116 under TS 6 does not resolve the
@@ -83,4 +83,54 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const materialRefs: MaterialRef[] = materialsResult.data ?? [];
 
 	return { batch, productName, quantity, unit, materialsVerified: materialRefs.length > 0 };
+};
+
+// Spanish messages for the completion error tokens (see SECURITY.md audit).
+function finalizeErrorMessages(token: string): string {
+	switch (token) {
+		case 'batch_not_found':
+			return 'El lote no existe.';
+		case 'batch_not_in_progress':
+			return 'El lote ya fue finalizado.';
+		case 'batch_request_not_found':
+			return 'No se puede finalizar el lote.';
+		case 'invalid_quantity':
+			return 'La cantidad no es válida.';
+		case 'not_authenticated':
+			return 'No hay sesión iniciada.';
+		case 'no_active_profile':
+			return 'Tu perfil no está activo.';
+		default:
+			return 'No se puede finalizar el lote.';
+	}
+}
+
+export const actions: Actions = {
+	// AI2: finalize the batch with the actual produced quantity. The form
+	// posts batch_id, actual_quantity and unit; the RPC performs the whole
+	// completion atomically and we simply redirect back to the production
+	// page (the selected shift cookie is untouched, so the same shift is
+	// still selected there).
+	finalize: async ({ request, locals, params }) => {
+		const formData = await request.formData();
+		const batchId: string = formData.get('batch_id')?.toString() ?? params.batchId ?? '';
+		const quantityRaw: string = formData.get('actual_quantity')?.toString() ?? '';
+		const unitRaw: string = formData.get('unit')?.toString() ?? '';
+		const unit = unitRaw.trim();
+
+		const quantity = Number(quantityRaw);
+		if (batchId === '' || !Number.isFinite(quantity) || quantity <= 0 || unit === '') {
+			return fail(400, { error: 'La cantidad no es válida.' });
+		}
+
+		const { data, error: rpcError } = await locals.supabase.rpc('complete_production_batch', {
+			p_batch_id: batchId,
+			p_actual_quantity: quantity,
+			p_unit: unit
+		});
+		if (rpcError) return fail(400, { error: finalizeErrorMessages(rpcError.message) });
+		void data;
+
+		redirect(303, '/production');
+	}
 };

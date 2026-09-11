@@ -1,7 +1,9 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import { enhance } from '$app/forms';
+	import { preventDoubleSubmit } from '$lib/forms';
+	import type { ActionData, PageData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	const shiftLabels: Record<string, string> = {
 		morning: 'MAÑANA',
@@ -14,6 +16,18 @@
 		completed: 'COMPLETADO',
 		cancelled: 'CANCELADO'
 	};
+
+	// AI2: the actual quantity starts prefilled with the requested quantity
+	// (guide §54). Kept as a string so typed values survive untouched and the
+	// server action does the final numeric validation.
+	let quantity = $state(String(data.quantity));
+
+	function stepQuantity(delta: number) {
+		const current = Number.parseFloat(quantity);
+		const base = Number.isFinite(current) ? current : 0;
+		const next = base + delta;
+		quantity = next > 0 ? String(next) : '0';
+	}
 </script>
 
 <main class="page">
@@ -47,9 +61,44 @@
 	</div>
 
 	{#if data.batch.status === 'in_progress'}
-		<!-- AH1: the button is shown but the completion flow (quantity form +
-			complete_production_batch) arrives in phases AI1/AI2. -->
-		<button type="button" class="finalize-btn" disabled>FINALIZAR</button>
+		<!-- AI2: completion form. Posts to this page's own finalize action
+			(params.batchId is authoritative, so no UUID travels in the form).
+			The unit is shown read-only and sent hidden; only the quantity is
+			operator-controlled. -->
+		<form method="POST" action="?/finalize" use:enhance={preventDoubleSubmit} class="finalize-form">
+			<p class="qty-label">Cantidad realizada</p>
+			<div class="qty-row">
+				<button
+					type="button"
+					class="qty-btn"
+					onclick={() => stepQuantity(-1)}
+					aria-label="Disminuir"
+				>
+					−
+				</button>
+				<input
+					type="number"
+					name="actual_quantity"
+					id="actual_quantity"
+					class="qty-input"
+					bind:value={quantity}
+					step="any"
+					min="0"
+					inputmode="decimal"
+				/>
+				<button type="button" class="qty-btn" onclick={() => stepQuantity(1)} aria-label="Aumentar">
+					+
+				</button>
+			</div>
+			<p class="qty-unit">{data.unit}</p>
+			<input type="hidden" name="unit" value={data.unit} />
+
+			{#if form?.error}
+				<p class="error" role="alert">{form.error}</p>
+			{/if}
+
+			<button type="submit" class="finalize-btn">CONFIRMAR FINALIZACIÓN</button>
+		</form>
 	{/if}
 </main>
 
@@ -95,6 +144,71 @@
 		color: var(--color-text-muted);
 	}
 
+	.finalize-form {
+		margin-top: 20px;
+	}
+
+	.qty-label {
+		margin: 0 0 8px;
+		font-size: 0.9375rem;
+		color: var(--color-text-muted);
+	}
+
+	.qty-row {
+		display: flex;
+		align-items: stretch;
+		gap: 8px;
+	}
+
+	.qty-btn {
+		width: 56px;
+		min-height: var(--touch-min);
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--color-text);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+	}
+
+	.qty-btn:disabled {
+		opacity: 0.5;
+	}
+
+	.qty-input {
+		flex: 1;
+		min-width: 0;
+		min-height: var(--touch-min);
+		font-size: 1.5rem;
+		font-weight: 700;
+		text-align: center;
+		color: var(--color-text);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		-moz-appearance: textfield;
+		appearance: textfield;
+	}
+
+	.qty-input::-webkit-outer-spin-button,
+	.qty-input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	.qty-unit {
+		margin: 8px 0 0;
+		text-align: center;
+		font-size: 0.9375rem;
+		color: var(--color-text-muted);
+	}
+
+	.error {
+		margin: 12px 0 0;
+		font-weight: 700;
+		color: var(--color-danger);
+	}
+
 	.finalize-btn {
 		display: block;
 		width: 100%;
@@ -108,5 +222,9 @@
 		background: var(--color-primary);
 		border: none;
 		border-radius: var(--radius);
+	}
+
+	.finalize-btn:disabled {
+		opacity: 0.5;
 	}
 </style>
