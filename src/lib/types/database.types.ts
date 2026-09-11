@@ -961,6 +961,10 @@ export type Database = {
         }
         Returns: string
       }
+      create_raw_material: {
+        Args: { p_default_unit: string; p_name: string }
+        Returns: string
+      }
       ensure_base_production_requests: {
         Args: { p_production_day_id: string }
         Returns: number
@@ -975,6 +979,10 @@ export type Database = {
         Args: { p_production_day_id: string; p_shift_code: string }
         Returns: string
       }
+      set_raw_material_active: {
+        Args: { p_active: boolean; p_id: string }
+        Returns: string
+      }
       start_production_batch: {
         Args: { p_production_request_id: string }
         Returns: Database["public"]["CompositeTypes"]["start_production_batch_result"]
@@ -984,6 +992,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      update_raw_material: {
+        Args: { p_default_unit: string; p_id: string; p_name: string }
+        Returns: string
       }
     }
     Enums: {

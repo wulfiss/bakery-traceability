@@ -42,19 +42,20 @@ RLS policies, grants, or RPCs change.
 Mutations that matter for traceability must go through narrow, transactional
 operations (SECURITY DEFINER RPCs), not browser table writes:
 
-| Area                 | Controlled operation(s)                     | Status        |
-| -------------------- | ------------------------------------------- | ------------- |
-| Business date        | `get_business_date()`                       | created (X0)  |
-| Production day       | `ensure_production_day(...)`                | created (X1)  |
-| Base requests        | `ensure_base_production_requests(...)`      | created (Y1)  |
-| External requests    | `ensure_external_order_requests(...)`       | created (Z1)  |
-| Additional requests  | `create_additional_production_request(...)` | created (AB1) |
-| Batch code           | `next_batch_code(...)`                      | created (AD1) |
-| Material lot change  | `change_current_material_lot(...)`          | created (W2)  |
-| Batch lifecycle      | `start_production_batch(...)`               | created (AF1) |
-| Batch completion     | `complete_production_batch(...)`            | created (AI1) |
-| External orders      | `create_external_order(...)`                | created (AK2) |
-| External order items | `add_external_order_item(...)`              | created (AK3) |
+| Area                  | Controlled operation(s)                                                                  | Status        |
+| --------------------- | ---------------------------------------------------------------------------------------- | ------------- |
+| Business date         | `get_business_date()`                                                                    | created (X0)  |
+| Production day        | `ensure_production_day(...)`                                                             | created (X1)  |
+| Base requests         | `ensure_base_production_requests(...)`                                                   | created (Y1)  |
+| External requests     | `ensure_external_order_requests(...)`                                                    | created (Z1)  |
+| Additional requests   | `create_additional_production_request(...)`                                              | created (AB1) |
+| Batch code            | `next_batch_code(...)`                                                                   | created (AD1) |
+| Material lot change   | `change_current_material_lot(...)`                                                       | created (W2)  |
+| Batch lifecycle       | `start_production_batch(...)`                                                            | created (AF1) |
+| Batch completion      | `complete_production_batch(...)`                                                         | created (AI1) |
+| External orders       | `create_external_order(...)`                                                             | created (AK2) |
+| External order items  | `add_external_order_item(...)`                                                           | created (AK3) |
+| Raw materials (admin) | `create_raw_material(...)` / `update_raw_material(...)` / `set_raw_material_active(...)` | created (AL1) |
 
 Until the remaining RPCs exist, the write paths are the controlled operations
 above plus the server-side (service role) path used by migrations and seed
@@ -69,8 +70,9 @@ Table mutation classification:
 - **Controlled operational state**: `production_days` (creation only through
   `ensure_production_day`), `production_requests`, `material_lots` (`is_current`
   switch only through `change_current_material_lot`), `production_batches`.
-- **Master data** (admin UI in later phases; no browser write path today):
-  `raw_materials`, `brands`, `raw_material_brands`, `products`, `recipes`,
+- **Master data** (admin UI since AL1 for `raw_materials`; no browser write path
+  for the rest): `raw_materials` (admin-controlled create/edit/soft-deactivate
+  since AL1), `brands`, `raw_material_brands`, `products`, `recipes`,
   `production_plan_items`. `external_orders` and `external_order_items` have
   controlled creation RPCs since AK2/AK3 (header + items; no editing/cancel yet).
 
@@ -87,7 +89,7 @@ Table mutation classification:
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit (U4, updated in W2, X0, X1, Y1, Z1, AB1, AD1, AF1, AI1, AK2 and AK3)
+## Audit (U4, updated in W2, X0, X1, Y1, Z1, AB1, AD1, AF1, AI1, AK2, AK3 and AL1)
 
 Functions in schema `public` (current state):
 
@@ -105,6 +107,9 @@ Functions in schema `public` (current state):
 | `create_external_order(text, text, date, text, text)`                               | Controlled write RPC: creates one `external_orders` header (status `pending`, `created_by` = acting user, returns the new order id) — auth/profile check, supervisor/admin role check (`insufficient_role` otherwise), trimmed non-empty order number + customer name, non-null requested date, optional delivery time (blank → null, invalid format → `invalid_delivery_time`), duplicate number → `order_number_exists`                                                                                                    | DEFINER (deliberate: performs the external_orders write no app role may do; all auth checks in-body)                           | `authenticated` only               |
 | `add_external_order_item(uuid, uuid, numeric, text, text, text)`                    | Controlled write RPC: adds one product item to an existing external order (returns the new item id) — auth/profile check, supervisor/admin role check (`insufficient_role` otherwise), order must exist (`order_not_found`), product must exist and be active (`product_not_available`), positive quantity (`invalid_quantity`), non-empty unit (`invalid_unit`), shift in morning/afternoon/night (`invalid_shift`); the submitted final shift is stored verbatim and never recalculated from `products.default_shift_code` | DEFINER (deliberate: performs the external_order_items write no app role may do; all auth checks in-body)                      | `authenticated` only               |
 | `next_batch_code(uuid, text)`                                                       | Read-only helper: next `PAN-DDMMYY-X-NNN` batch code from the stored `production_date`; sequence resets by `production_date + shift_code`; transaction-scoped advisory lock (per day+shift) makes generate-then-insert in one transaction concurrency-safe                                                                                                                                                                                                                                                                   | INVOKER (deliberate: no writes of its own, no privilege escalation; the calling RPC keeps its authorization checks)            | `authenticated` only               |
+| `create_raw_material(text, text)`                                                   | Controlled write RPC (admin master data): trims name/unit, rejects blanks (`invalid_name`, `invalid_unit`), case-insensitive name uniqueness (`raw_material_name_exists`); inserts `raw_materials`; admin-only in-body gate (`insufficient_role` for operator/supervisor)                                                                                                                                                                                                                                                    | DEFINER (deliberate: performs the raw_materials insert no app role may do; all auth checks in-body)                            | `authenticated` only               |
+| `update_raw_material(uuid, text, text)`                                             | Controlled write RPC (admin master data): material must exist (`raw_material_not_found`); trims name/unit, rejects blanks (`invalid_name`, `invalid_unit`); case-insensitive name uniqueness excluding the row itself (`raw_material_name_exists`); updates name/default_unit/updated_at; admin-only in-body gate (`insufficient_role`)                                                                                                                                                                                      | DEFINER (deliberate: performs the raw_materials update no app role may do; all auth checks in-body)                            | `authenticated` only               |
+| `set_raw_material_active(uuid, boolean)`                                            | Controlled write RPC (admin master data): material must exist (`raw_material_not_found`); soft toggle of `active` (deactivation sets `active = false`; never a physical delete, because `material_lots`, `batch_materials`, `raw_material_brands` and `recipe_ingredients` reference `raw_materials` with RESTRICT FKs); admin-only in-body gate (`insufficient_role`)                                                                                                                                                       | DEFINER (deliberate: performs the raw_materials update no app role may do; all auth checks in-body)                            | `authenticated` only               |
 
 Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
 
