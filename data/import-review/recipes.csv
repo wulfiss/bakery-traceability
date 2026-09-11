@@ -1,0 +1,3 @@
+recipe_name,source,status,notes
+Baguette,V4 §41 seed spec; dev database (recipe 8ab0caba-5912-4320-aca9-3511c7bac340),confirmed,"Dev seed test recipe, version 1, active: Harina 000 1.0 kg, Levadura 0.03 kg, Sal 0.02 kg; produces Baguette. The V4 §41 spec explicitly says it is a simple test recipe, NOT the real COSTEO data - real recipe set is not present in the workspace."
+Pan Mignon,V4 §11 (recipe versioning example),review_required,"Example only: shows version 1 retired and version 2 active to explain versioning; no real recipe definition, ingredients or quantities exist in the workspace."
