@@ -44,13 +44,14 @@ operations (SECURITY DEFINER RPCs), not browser table writes:
 
 | Area                | Controlled operation(s)                                         | Status                      |
 | ------------------- | --------------------------------------------------------------- | --------------------------- |
-| Business date       | `get_business_date()`                                           | to be created (phase X)     |
+| Business date       | `get_business_date()`                                           | created (X0)                |
 | Production day      | `ensure_production_day(...)`                                    | to be created (phase X)     |
-| Material lot change | `change_current_material_lot(...)`                              | to be created (later phase) |
+| Material lot change | `change_current_material_lot(...)`                              | created (W2)                |
 | Batch lifecycle     | `start_production_batch(...)`, `complete_production_batch(...)` | to be created (later phase) |
 
-Until those RPCs exist, the only write path is the server-side (service
-role) path used by migrations and seed scripts.
+Until the remaining RPCs exist, the write paths are the controlled operations
+above plus the server-side (service role) path used by migrations and seed
+scripts.
 
 Table mutation classification:
 
@@ -78,7 +79,7 @@ Table mutation classification:
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit (U4, updated in W2)
+## Audit (U4, updated in W2 and X0)
 
 Functions in schema `public` (current state):
 
@@ -86,6 +87,7 @@ Functions in schema `public` (current state):
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------- |
 | `reject_parent_batch_self_reference()`                | BEFORE INSERT/UPDATE trigger guard on `parent_batch_inputs` (a batch cannot consume its own output)                          | INVOKER (deliberate: pure read-only guard)                                              | `postgres` (owner), `service_role` |
 | `change_current_material_lot(uuid, uuid, text, date)` | Controlled write RPC: atomically closes the prior current lot of a raw material and creates the new one (in_use, is_current) | DEFINER (deliberate: performs close/insert no app role may do; all auth checks in-body) | `authenticated` only               |
+| `get_business_date()`                                 | Read-only helper: current date in `America/Argentina/Cordoba`, single source for `production_date`                           | INVOKER (deliberate: no writes, no privilege escalation)                                | `authenticated` only               |
 
 Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
 
