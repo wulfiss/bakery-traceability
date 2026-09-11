@@ -78,13 +78,14 @@ Table mutation classification:
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit (U4)
+## Audit (U4, updated in W2)
 
-Functions in schema `public` at the time of the U4 audit:
+Functions in schema `public` (current state):
 
-| Function                               | Kind                                                                                                | Security                                   | Execute granted to                 |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------ | ---------------------------------- |
-| `reject_parent_batch_self_reference()` | BEFORE INSERT/UPDATE trigger guard on `parent_batch_inputs` (a batch cannot consume its own output) | INVOKER (deliberate: pure read-only guard) | `postgres` (owner), `service_role` |
+| Function                                              | Kind                                                                                                                         | Security                                                                                | Execute granted to                 |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------- |
+| `reject_parent_batch_self_reference()`                | BEFORE INSERT/UPDATE trigger guard on `parent_batch_inputs` (a batch cannot consume its own output)                          | INVOKER (deliberate: pure read-only guard)                                              | `postgres` (owner), `service_role` |
+| `change_current_material_lot(uuid, uuid, text, date)` | Controlled write RPC: atomically closes the prior current lot of a raw material and creates the new one (in_use, is_current) | DEFINER (deliberate: performs close/insert no app role may do; all auth checks in-body) | `authenticated` only               |
 
 Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
 
