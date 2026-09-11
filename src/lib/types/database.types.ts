@@ -924,6 +924,10 @@ export type Database = {
         }
         Returns: string
       }
+      ensure_base_production_requests: {
+        Args: { p_production_day_id: string }
+        Returns: number
+      }
       ensure_production_day: { Args: never; Returns: string }
       get_business_date: { Args: never; Returns: string }
     }
