@@ -1,0 +1,6 @@
+raw_material,brand,source,status,notes
+Harina 000,Lealtad,V4 guide §9 + §41 + §62/§63,confirmed,Explicit in current spec (raw material and brand are separate; never "Harina Lealtad").
+Sal,Dos Anclas,V4 guide §9,confirmed,Explicit in current spec ("Sal → Dos Anclas").
+Levadura,Calsa,V4 guide §9,confirmed,Explicit in current spec ("Levadura → Calsa").
+Harina 000,Imán,V2 guide §Marca,review_required,Older V2 guide lists it as a possible Harina 000 brand; V4 silent; not guessed.
+Harina 000,Cañuelas,V2 guide §Marca,review_required,Older V2 guide lists it as a possible Harina 000 brand; V4 silent; not guessed.
