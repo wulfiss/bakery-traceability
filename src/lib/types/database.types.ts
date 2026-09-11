@@ -950,12 +950,25 @@ export type Database = {
         Args: { p_production_day_id: string; p_shift_code: string }
         Returns: string
       }
+      start_production_batch: {
+        Args: { p_production_request_id: string }
+        Returns: Database["public"]["CompositeTypes"]["start_production_batch_result"]
+        SetofOptions: {
+          from: "*"
+          to: "start_production_batch_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      start_production_batch_result: {
+        batch_id: string | null
+        batch_code: string | null
+      }
     }
   }
 }
