@@ -7,3 +7,6 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+# Generated files (do not reformat)
+src/lib/types/database.types.ts
