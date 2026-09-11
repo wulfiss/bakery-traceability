@@ -1,0 +1,83 @@
+# SECURITY.md — Bakery Traceability
+
+Write-access model for the bakery traceability MVP. Keep this file current when
+RLS policies, grants, or RPCs change.
+
+## Key handling
+
+- The browser app only ever uses the Supabase **publishable** key
+  (`PUBLIC_SUPABASE_PUBLISHABLE_KEY`) through `@supabase/ssr` (cookie-based
+  session, server-side client in `src/lib/supabase/server.ts`).
+- `service_role` is never bundled into, sent to, or referenced by client code.
+  It is only used server-side (migrations, seed scripts, admin API operations).
+
+## Roles
+
+- Auth: Supabase email/password. One app role per user in `profiles.role`:
+  `operator`, `supervisor`, `admin` (check-constrained). `profiles.active`
+  gates all data access.
+- Authorization lives in server/database security. Hiding a button in the UI is
+  never authorization.
+
+## Row Level Security (current state)
+
+- RLS is **enabled on all 21 business tables** (never disable it; verify in
+  `pg_class.relrowsecurity`).
+- The only policies are **SELECT-only**, granted to the `authenticated`
+  Postgres role, and gated on the requesting user having an active profile:
+
+  | Scope            | Tables                                                                                                                                                                           | Policy pattern                                                                         |
+  | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+  | Master data (U1) | raw_materials, brands, raw_material_brands, material_lots, products, recipes, recipe_versions, recipe_ingredients, recipe_products, recipe_product_inputs, production_plan_items | `FOR SELECT TO authenticated USING (exists (… profiles … id = auth.uid() and active))` |
+  | Operational (U2) | production_days, production_requests, production_batches, batch_materials, batch_outputs, batch_requests, parent_batch_inputs, external_orders, external_order_items             | same pattern                                                                           |
+  | Profiles (U1)    | profiles                                                                                                                                                                         | `FOR SELECT TO authenticated USING (id = auth.uid())` (own row; not recursive)         |
+
+- There are **no INSERT/UPDATE/DELETE policies on any business table**.
+  Authenticated users hold DML grants but RLS denies every direct write.
+  An operator cannot rewrite traceability history through the client — or at
+  all — while this state holds.
+
+## Controlled write strategy
+
+Mutations that matter for traceability must go through narrow, transactional
+operations (SECURITY DEFINER RPCs), not browser table writes:
+
+| Area                | Controlled operation(s)                                         | Status                      |
+| ------------------- | --------------------------------------------------------------- | --------------------------- |
+| Business date       | `get_business_date()`                                           | to be created (phase X)     |
+| Production day      | `ensure_production_day(...)`                                    | to be created (phase X)     |
+| Material lot change | `change_current_material_lot(...)`                              | to be created (later phase) |
+| Batch lifecycle     | `start_production_batch(...)`, `complete_production_batch(...)` | to be created (later phase) |
+
+Until those RPCs exist, the only write path is the server-side (service
+role) path used by migrations and seed scripts.
+
+Table mutation classification:
+
+- **Immutable traceability history** (append-mostly, never UPDATE/DELETE):
+  `batch_materials`, `batch_outputs`, `batch_requests`, `parent_batch_inputs`,
+  `production_batches` (once started), `recipe_versions`,
+  `recipe_ingredients`, `recipe_products`, `recipe_product_inputs`.
+- **Controlled operational state**: `production_days`, `production_requests`,
+  `material_lots` (`is_current` switch only through
+  `change_current_material_lot`), `production_batches`.
+- **Master data** (admin UI in later phases; no browser write path today):
+  `raw_materials`, `brands`, `raw_material_brands`, `products`, `recipes`,
+  `production_plan_items`, `external_orders`, `external_order_items`.
+
+## RPC security checklist (applies to every future function)
+
+- Choose SECURITY INVOKER / DEFINER deliberately; document the reason.
+- SECURITY DEFINER functions must:
+  - require `auth.uid()` to be non-null,
+  - validate the caller's `profiles` row is `active` (and role where needed),
+  - set an explicit safe `search_path`,
+  - `REVOKE EXECUTE FROM PUBLIC`, and
+  - `GRANT EXECUTE` only to the minimum required Postgres role.
+- Never trust UI-hidden controls; every authorization check is in the database
+  or server layer.
+
+## Audit
+
+- U4 audits every RPC created so far against this checklist and records the
+  permission model per function.
