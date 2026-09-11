@@ -935,6 +935,10 @@ export type Database = {
         }
         Returns: string
       }
+      complete_multi_output_batch: {
+        Args: { p_batch_id: string; p_outputs: Json }
+        Returns: undefined
+      }
       complete_production_batch: {
         Args: { p_actual_quantity: number; p_batch_id: string; p_unit: string }
         Returns: undefined
