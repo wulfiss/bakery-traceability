@@ -47,6 +47,7 @@ operations (SECURITY DEFINER RPCs), not browser table writes:
 | Business date       | `get_business_date()`                                           | created (X0)                |
 | Production day      | `ensure_production_day(...)`                                    | created (X1)                |
 | Base requests       | `ensure_base_production_requests(...)`                          | created (Y1)                |
+| External requests   | `ensure_external_order_requests(...)`                           | created (Z1)                |
 | Material lot change | `change_current_material_lot(...)`                              | created (W2)                |
 | Batch lifecycle     | `start_production_batch(...)`, `complete_production_batch(...)` | to be created (later phase) |
 
@@ -80,17 +81,18 @@ Table mutation classification:
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit (U4, updated in W2, X0, X1 and Y1)
+## Audit (U4, updated in W2, X0, X1, Y1 and Z1)
 
 Functions in schema `public` (current state):
 
-| Function                                              | Kind                                                                                                                            | Security                                                                                | Execute granted to                 |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------- |
-| `reject_parent_batch_self_reference()`                | BEFORE INSERT/UPDATE trigger guard on `parent_batch_inputs` (a batch cannot consume its own output)                             | INVOKER (deliberate: pure read-only guard)                                              | `postgres` (owner), `service_role` |
-| `change_current_material_lot(uuid, uuid, text, date)` | Controlled write RPC: atomically closes the prior current lot of a raw material and creates the new one (in_use, is_current)    | DEFINER (deliberate: performs close/insert no app role may do; all auth checks in-body) | `authenticated` only               |
-| `get_business_date()`                                 | Read-only helper: current date in `America/Argentina/Cordoba`, single source for `production_date`                              | INVOKER (deliberate: no writes, no privilege escalation)                                | `authenticated` only               |
-| `ensure_production_day()`                             | Controlled write RPC: idempotently creates the current business production day (status open) or returns the existing one        | DEFINER (deliberate: performs the insert no app role may do; all auth checks in-body)   | `authenticated` only               |
-| `ensure_base_production_requests(uuid)`               | Controlled write RPC: idempotently creates `source_type=base` requests from the active weekly plan of the stored date's weekday | DEFINER (deliberate: performs the inserts no app role may do; all auth checks in-body)  | `authenticated` only               |
+| Function                                              | Kind                                                                                                                                       | Security                                                                                | Execute granted to                 |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | ---------------------------------- |
+| `reject_parent_batch_self_reference()`                | BEFORE INSERT/UPDATE trigger guard on `parent_batch_inputs` (a batch cannot consume its own output)                                        | INVOKER (deliberate: pure read-only guard)                                              | `postgres` (owner), `service_role` |
+| `change_current_material_lot(uuid, uuid, text, date)` | Controlled write RPC: atomically closes the prior current lot of a raw material and creates the new one (in_use, is_current)               | DEFINER (deliberate: performs close/insert no app role may do; all auth checks in-body) | `authenticated` only               |
+| `get_business_date()`                                 | Read-only helper: current date in `America/Argentina/Cordoba`, single source for `production_date`                                         | INVOKER (deliberate: no writes, no privilege escalation)                                | `authenticated` only               |
+| `ensure_production_day()`                             | Controlled write RPC: idempotently creates the current business production day (status open) or returns the existing one                   | DEFINER (deliberate: performs the insert no app role may do; all auth checks in-body)   | `authenticated` only               |
+| `ensure_base_production_requests(uuid)`               | Controlled write RPC: idempotently creates `source_type=base` requests from the active weekly plan of the stored date's weekday            | DEFINER (deliberate: performs the inserts no app role may do; all auth checks in-body)  | `authenticated` only               |
+| `ensure_external_order_requests(uuid)`                | Controlled write RPC: idempotently creates `source_type=external_order` requests from the non-cancelled external orders of the stored date | DEFINER (deliberate: performs the inserts no app role may do; all auth checks in-body)  | `authenticated` only               |
 
 Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
 

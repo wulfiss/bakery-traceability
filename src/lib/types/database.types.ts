@@ -928,6 +928,10 @@ export type Database = {
         Args: { p_production_day_id: string }
         Returns: number
       }
+      ensure_external_order_requests: {
+        Args: { p_production_day_id: string }
+        Returns: number
+      }
       ensure_production_day: { Args: never; Returns: string }
       get_business_date: { Args: never; Returns: string }
     }
