@@ -1,0 +1,24 @@
+source_product_name,normalized_product_name,shift_code,status,notes
+Cara sucia,Cara sucia,morning,confirmed,From guide §4 (source: turnos_produccion_panaderia-1.xlsx) MAÑANA list.
+Pan baguette,Pan baguette,morning,confirmed,MAÑANA list. Current dev seed uses the name "Baguette" (morning); reconcile during the products step.
+Chip,Chip,morning,confirmed,MAÑANA list. The source spreadsheet also contains a second Chip row with no shift (see review_required row below).
+Medialunas saladas,Medialunas saladas,morning,confirmed,MAÑANA list.
+Pan salvado,Pan salvado,morning,confirmed,MAÑANA list.
+Pan pebete,Pan pebete,morning,confirmed,MAÑANA list.
+Chicharrón,Chicharrón,morning,confirmed,MAÑANA list.
+Trencitas dulces,Trencitas dulces,afternoon,confirmed,TARDE list.
+Medialunas dulces / marplatence,Medialunas dulces / marplatence,afternoon,confirmed,TARDE list. Name kept verbatim (source spelling "marplatence" preserved; not corrected).
+Medialunas rellenas,Medialunas rellenas,afternoon,confirmed,TARDE list.
+Chipacitos,Chipacitos,night,confirmed,NOCHE list.
+Palmeritas,Palmeritas,night,confirmed,NOCHE list.
+Pan lactal,Pan lactal,night,confirmed,NOCHE list.
+Pan integral,Pan integral,night,confirmed,NOCHE list.
+Pan miga,Pan miga,night,confirmed,NOCHE list.
+Prepizza,Prepizza,night,confirmed,NOCHE list.
+Pizzeta,Pizzeta,night,confirmed,NOCHE list.
+Hamburguesa,Hamburguesa,night,confirmed,NOCHE list.
+Pan árabe,Pan árabe,night,confirmed,NOCHE list.
+Pan pernil,Pan pernil,night,confirmed,NOCHE list.
+Hojaldre membrillo y crema,Hojaldre membrillo y crema,night,confirmed,NOCHE list.
+Dobladillos de membrillo y batata,Dobladillos de membrillo y batata,night,confirmed,NOCHE list.
+Chip,Chip,,review_required,Second Chip row in the source spreadsheet with no shift; per guide §4 no shift was guessed and no second product or second shift mapping was created.
