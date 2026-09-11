@@ -39,24 +39,18 @@
 		<span class="detail-value">{data.quantity} {data.unit}</span>
 	</div>
 
-	<section class="section">
-		<h2>Materias primas</h2>
-		{#if data.materials.length === 0}
-			<p class="empty">Sin materias primas registradas.</p>
-		{:else}
-			<ul class="materials">
-				{#each data.materials as material (material.name)}
-					<li class="material">
-						<span class="material-name">
-							{material.name} — {material.quantity}
-							{material.unit}
-						</span>
-						<span class="material-lot">Lote {material.lot}</span>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-	</section>
+	<div class="detail">
+		<span class="detail-label">Materias primas</span>
+		<span class="detail-value {data.materialsVerified ? '' : 'muted'}">
+			{data.materialsVerified ? '✓ verificadas' : '—'}
+		</span>
+	</div>
+
+	{#if data.batch.status === 'in_progress'}
+		<!-- AH1: the button is shown but the completion flow (quantity form +
+			complete_production_batch) arrives in phases AI1/AI2. -->
+		<button type="button" class="finalize-btn" disabled>FINALIZAR</button>
+	{/if}
 </main>
 
 <style>
@@ -97,48 +91,22 @@
 		text-align: right;
 	}
 
-	.section {
+	.muted {
+		color: var(--color-text-muted);
+	}
+
+	.finalize-btn {
+		display: block;
+		width: 100%;
+		min-height: var(--touch-min);
 		margin-top: 20px;
-	}
-
-	h2 {
-		font-size: 1.0625rem;
-		margin: 0 0 8px;
-	}
-
-	.materials {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-
-	.material {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 8px;
-		background: var(--color-surface);
-		border: 1px solid var(--color-border);
+		padding: 12px 16px;
+		font-size: 1rem;
+		font-weight: 700;
+		text-align: center;
+		color: var(--color-on-primary);
+		background: var(--color-primary);
+		border: none;
 		border-radius: var(--radius);
-		padding: 12px 14px;
-	}
-
-	.material-name {
-		font-size: 0.95rem;
-	}
-
-	.material-lot {
-		font-size: 0.9375rem;
-		color: var(--color-text-muted);
-		white-space: nowrap;
-	}
-
-	.empty {
-		margin: 0;
-		color: var(--color-text-muted);
-		font-size: 0.9375rem;
 	}
 </style>
