@@ -1,14 +1,17 @@
 import { type Handle } from '@sveltejs/kit';
 import { getSupabaseServerClient } from '$lib/supabase/server';
 
-// Wires cookie-based Supabase session handling into every server request.
-// The session is refreshed/validated before the page renders, so SSR always
-// sees a valid token and refreshed cookies are written to this response.
-// No login redirect or page guards yet: those arrive with the login phase.
+// Single auth source per server request:
+// - the request-scoped Supabase server client is created here,
+// - the session is refreshed/validated (cookie writes land in this response),
+// - the user is resolved once and exposed through event.locals,
+//   so layouts and pages never call auth again.
 export const handle: Handle = async ({ event, resolve }) => {
 	const supabase = getSupabaseServerClient(event);
+	const { data } = await supabase.auth.getUser();
 
-	await supabase.auth.getClaims();
+	event.locals.supabase = supabase;
+	event.locals.user = data.user;
 
 	return resolve(event);
 };

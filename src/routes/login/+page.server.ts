@@ -1,12 +1,10 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getSupabaseServerClient } from '$lib/supabase/server';
 
 // If the user already has a session, sending them to login is pointless.
-export const load: PageServerLoad = async (event) => {
-	const supabase = getSupabaseServerClient(event);
-	const { data } = await supabase.auth.getUser();
-	if (data.user) {
+// The session is resolved once in hooks.server.ts (event.locals).
+export const load: PageServerLoad = (event) => {
+	if (event.locals.user) {
 		throw redirect(303, '/production');
 	}
 };
@@ -23,7 +21,8 @@ export const actions: Actions = {
 			return fail(400, { email, error: 'El correo y la contraseña son obligatorios.' });
 		}
 
-		const supabase = getSupabaseServerClient(event);
+		// Reuse the request-scoped client created in hooks.server.ts.
+		const supabase = event.locals.supabase;
 		const { error } = await supabase.auth.signInWithPassword({ email, password });
 
 		if (error) {
