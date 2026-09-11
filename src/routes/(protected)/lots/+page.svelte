@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -14,6 +15,10 @@
 
 <main class="page">
 	<h1>Materias primas en uso</h1>
+
+	{#if data.items.length > 0}
+		<a class="change-lot" href={resolve('/lots/change')}>Cambiar lote actual</a>
+	{/if}
 
 	{#if data.items.length === 0}
 		<p class="empty">No hay materias primas activas.</p>
@@ -46,6 +51,21 @@
 	h1 {
 		font-size: 1.375rem;
 		margin-bottom: 16px;
+	}
+
+	.change-lot {
+		display: block;
+		width: 100%;
+		min-height: var(--touch-min);
+		margin-bottom: 16px;
+		padding: 10px 16px;
+		font-size: 1rem;
+		font-weight: 700;
+		text-align: center;
+		text-decoration: none;
+		color: var(--color-on-primary);
+		background: var(--color-primary);
+		border-radius: var(--radius);
 	}
 
 	.cards {

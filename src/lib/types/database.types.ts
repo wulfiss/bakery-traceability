@@ -915,7 +915,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      change_current_material_lot: {
+        Args: {
+          p_brand_id: string
+          p_expiry_date?: string
+          p_raw_material_id: string
+          p_supplier_lot: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
