@@ -1,0 +1,2 @@
+recipe_name,product_name,source,status,notes
+Baguette,Baguette,dev seed (V4 §41; recipe 8ab0caba-5912-4320-aca9-3511c7bac340),confirmed,Dev seed TEST recipe mapping - not real COSTEO data. Product name "Baguette" must reconcile with source name "Pan baguette" (see products.csv) before import.
