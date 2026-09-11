@@ -1,0 +1,4 @@
+recipe_name,version_number,raw_material,quantity,unit,source,status,notes
+Baguette,1,Harina 000,1.0,kg,dev seed (V4 §41; recipe 8ab0caba-5912-4320-aca9-3511c7bac340),confirmed,Dev seed TEST recipe - not real COSTEO data.
+Baguette,1,Levadura,0.03,kg,dev seed (V4 §41; recipe 8ab0caba-5912-4320-aca9-3511c7bac340),confirmed,Dev seed TEST recipe - not real COSTEO data.
+Baguette,1,Sal,0.02,kg,dev seed (V4 §41; recipe 8ab0caba-5912-4320-aca9-3511c7bac340),confirmed,Dev seed TEST recipe - not real COSTEO data.
