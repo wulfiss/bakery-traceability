@@ -940,6 +940,16 @@ export type Database = {
         }
         Returns: string
       }
+      create_external_order: {
+        Args: {
+          p_customer_name: string
+          p_delivery_time: string
+          p_notes: string
+          p_order_number: string
+          p_requested_date: string
+        }
+        Returns: string
+      }
       ensure_base_production_requests: {
         Args: { p_production_day_id: string }
         Returns: number

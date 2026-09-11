@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -12,7 +13,10 @@
 </script>
 
 <main class="page">
-	<h1>Pedidos externos</h1>
+	<div class="header">
+		<h1>Pedidos externos</h1>
+		<a class="new-btn" href={resolve('/admin/external-orders/new')}>Nuevo pedido</a>
+	</div>
 
 	{#if data.orders.length === 0}
 		<p class="empty">Sin pedidos externos.</p>
@@ -38,6 +42,26 @@
 		width: 100%;
 		max-width: var(--content-max);
 		margin: 0 auto;
+	}
+
+	.header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
+
+	.new-btn {
+		display: inline-block;
+		min-height: var(--touch-min);
+		padding: 8px 14px;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-surface);
+		color: var(--color-text);
+		font-size: 0.9rem;
+		font-weight: 700;
+		text-decoration: none;
 	}
 
 	.empty {

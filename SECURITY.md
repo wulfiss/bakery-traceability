@@ -53,6 +53,7 @@ operations (SECURITY DEFINER RPCs), not browser table writes:
 | Material lot change | `change_current_material_lot(...)`          | created (W2)  |
 | Batch lifecycle     | `start_production_batch(...)`               | created (AF1) |
 | Batch completion    | `complete_production_batch(...)`            | created (AI1) |
+| External orders     | `create_external_order(...)`                | created (AK2) |
 
 Until the remaining RPCs exist, the write paths are the controlled operations
 above plus the server-side (service role) path used by migrations and seed
@@ -69,7 +70,9 @@ Table mutation classification:
   switch only through `change_current_material_lot`), `production_batches`.
 - **Master data** (admin UI in later phases; no browser write path today):
   `raw_materials`, `brands`, `raw_material_brands`, `products`, `recipes`,
-  `production_plan_items`, `external_orders`, `external_order_items`.
+  `production_plan_items`, `external_order_items`. `external_orders` has a
+  controlled creation RPC since AK2 (headers only; items still have no write
+  path).
 
 ## RPC security checklist (applies to every future function)
 
@@ -84,7 +87,7 @@ Table mutation classification:
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit (U4, updated in W2, X0, X1, Y1, Z1, AB1, AD1, AF1 and AI1)
+## Audit (U4, updated in W2, X0, X1, Y1, Z1, AB1, AD1, AF1, AI1 and AK2)
 
 Functions in schema `public` (current state):
 
@@ -99,6 +102,7 @@ Functions in schema `public` (current state):
 | `create_additional_production_request(uuid, uuid, numeric, text, text, text, text)` | Controlled write RPC: creates one `source_type=additional`, `status=pending` request with a required `reason_code` (non-empty `reason_note` when `other`); returns the new request id                                                                                                                                                                                                                                              | DEFINER (deliberate: performs the insert no app role may do; all auth checks in-body)                                          | `authenticated` only               |
 | `start_production_batch(uuid)`                                                      | Controlled write RPC: atomic all-or-nothing batch start for one pending request — auth/profile check, active recipe resolution, required current-lot validation (`missing_material_lot: <names>`), in-transaction safe code via `next_batch_code`, exact lot snapshot into `batch_materials`, request link + status advance; request row locked `FOR UPDATE` against concurrent double-starts                                      | DEFINER (deliberate: performs batch/batch_materials/batch_requests/request writes no app role may do; all auth checks in-body) | `authenticated` only               |
 | `complete_production_batch(uuid, numeric, text)`                                    | Controlled write RPC: atomic all-or-nothing completion of an in-progress single-product batch — auth/profile check, batch row locked `FOR UPDATE` (concurrent completion fails with `batch_not_in_progress`), actual quantity/unit validation, `batch_outputs` insert, batch `completed` + `finished_at`/`finished_by`, linked request `completed`, `allocated_quantity` backfill only when null; never modifies `batch_materials` | DEFINER (deliberate: performs batch/request/output writes no app role may do; all auth checks in-body)                         | `authenticated` only               |
+| `create_external_order(text, text, date, text, text)`                               | Controlled write RPC: creates one `external_orders` header (status `pending`, `created_by` = acting user, returns the new order id) — auth/profile check, supervisor/admin role check (`insufficient_role` otherwise), trimmed non-empty order number + customer name, non-null requested date, optional delivery time (blank → null, invalid format → `invalid_delivery_time`), duplicate number → `order_number_exists`          | DEFINER (deliberate: performs the external_orders write no app role may do; all auth checks in-body)                           | `authenticated` only               |
 | `next_batch_code(uuid, text)`                                                       | Read-only helper: next `PAN-DDMMYY-X-NNN` batch code from the stored `production_date`; sequence resets by `production_date + shift_code`; transaction-scoped advisory lock (per day+shift) makes generate-then-insert in one transaction concurrency-safe                                                                                                                                                                         | INVOKER (deliberate: no writes of its own, no privilege escalation; the calling RPC keeps its authorization checks)            | `authenticated` only               |
 
 Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
