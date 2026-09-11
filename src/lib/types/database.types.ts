@@ -924,6 +924,10 @@ export type Database = {
         }
         Returns: string
       }
+      complete_production_batch: {
+        Args: { p_actual_quantity: number; p_batch_id: string; p_unit: string }
+        Returns: undefined
+      }
       create_additional_production_request: {
         Args: {
           p_product_id: string
