@@ -33,6 +33,17 @@ type OutputProduct = {
 	name: string;
 	unit: string;
 };
+type BatchOutputRef = Pick<
+	Database['public']['Tables']['batch_outputs']['Row'],
+	'quantity' | 'unit'
+> & {
+	products: Pick<Database['public']['Tables']['products']['Row'], 'id' | 'name'> | null;
+};
+type BatchOutput = {
+	name: string;
+	quantity: number;
+	unit: string;
+};
 
 // AO2: resolve the products the batch's recipe produces, in recipe sort
 // order. Used by load (to decide which completion form to show) and by the
@@ -175,6 +186,28 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const recipe = await resolveRecipeProducts(supabase, batchId);
 	const multiOutputs = recipe.products.length > 1 ? recipe.products : null;
 
+	// 5. AO3: what the batch actually produced. Outputs are recorded only at
+	// finalization, so they are fetched only for completed batches; the batch
+	// detail then lists every recorded output (a single-output batch shows one
+	// row, a multi-output batch shows them all).
+	let outputs: BatchOutput[] = [];
+	if (batch.status === 'completed') {
+		const outputsResult = await supabase
+			.from('batch_outputs')
+			.select('quantity, unit, products(id, name)')
+			.eq('batch_id', batchId);
+		if (outputsResult.error) throw outputsResult.error;
+		const outputRefs: BatchOutputRef[] = outputsResult.data ?? [];
+		outputs = outputRefs
+			.filter((row) => row.products !== null)
+			.map((row) => ({
+				name: row.products?.name ?? '—',
+				quantity: row.quantity,
+				unit: row.unit
+			}))
+			.sort((a, b) => a.name.localeCompare(b.name));
+	}
+
 	return {
 		batch,
 		productName,
@@ -182,7 +215,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		unit,
 		materialsVerified: materialRefs.length > 0,
 		recipeName: multiOutputs ? recipe.recipeName : null,
-		multiOutputs
+		multiOutputs,
+		outputs
 	};
 };
 

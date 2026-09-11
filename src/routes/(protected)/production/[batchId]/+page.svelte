@@ -59,6 +59,20 @@
 		<span class="detail-value">{data.quantity} {data.unit}</span>
 	</div>
 
+	{#if data.batch.status === 'completed' && data.outputs.length > 0}
+		<!-- AO3: the outputs actually recorded at finalization. A multi-output
+			batch shows one row per produced product. -->
+		<div class="outputs">
+			<p class="outputs-title">Producción realizada</p>
+			{#each data.outputs as output (output.name)}
+				<div class="output-row">
+					<span class="output-row-name">{output.name}</span>
+					<span class="output-row-qty">{output.quantity} {output.unit}</span>
+				</div>
+			{/each}
+		</div>
+	{/if}
+
 	{#if data.recipeName}
 		<div class="detail">
 			<span class="detail-label">Preparación</span>
@@ -196,6 +210,42 @@
 		font-size: 0.95rem;
 		font-weight: 700;
 		text-align: right;
+	}
+
+	.outputs {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 12px 14px;
+		margin-bottom: 8px;
+	}
+
+	.outputs-title {
+		margin: 0 0 8px;
+		font-size: 0.9375rem;
+		color: var(--color-text-muted);
+	}
+
+	.output-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		padding: 6px 0;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.output-row-name {
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: var(--color-text);
+	}
+
+	.output-row-qty {
+		font-size: 0.95rem;
+		font-weight: 700;
+		text-align: right;
+		color: var(--color-text);
 	}
 
 	.muted {
