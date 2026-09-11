@@ -22,6 +22,12 @@
 	// server action does the final numeric validation.
 	let quantity = $state(String(data.quantity));
 
+	// AO2: per-product quantities for the multi-output form (empty = that
+	// product is not produced and is not recorded).
+	let multiQuantities = $state<Record<string, string>>(
+		Object.fromEntries((data.multiOutputs ?? []).map((product) => [product.id, '']))
+	);
+
 	function stepQuantity(delta: number) {
 		const current = Number.parseFloat(quantity);
 		const base = Number.isFinite(current) ? current : 0;
@@ -53,6 +59,13 @@
 		<span class="detail-value">{data.quantity} {data.unit}</span>
 	</div>
 
+	{#if data.recipeName}
+		<div class="detail">
+			<span class="detail-label">Preparación</span>
+			<span class="detail-value">{data.recipeName}</span>
+		</div>
+	{/if}
+
 	<div class="detail">
 		<span class="detail-label">Materias primas</span>
 		<span class="detail-value {data.materialsVerified ? '' : 'muted'}">
@@ -61,44 +74,89 @@
 	</div>
 
 	{#if data.batch.status === 'in_progress'}
-		<!-- AI2: completion form. Posts to this page's own finalize action
+		{#if data.multiOutputs}
+			<!-- AO2: multi-output completion form. One quantity per product of
+				the batch's recipe; the units come from the products (read-only)
+				and products left empty are not recorded. -->
+			<form
+				method="POST"
+				action="?/finalizeMulti"
+				use:enhance={preventDoubleSubmit}
+				class="finalize-form"
+			>
+				<p class="qty-label">Cantidad realizada por producto</p>
+				{#each data.multiOutputs as product (product.id)}
+					<div class="output">
+						<p class="output-name">{product.name}</p>
+						<input
+							type="number"
+							name="qty_{product.id}"
+							class="output-input"
+							bind:value={multiQuantities[product.id]}
+							step="any"
+							min="0"
+							inputmode="decimal"
+						/>
+						<p class="qty-unit">{product.unit}</p>
+					</div>
+				{/each}
+
+				{#if form?.error}
+					<p class="error" role="alert">{form.error}</p>
+				{/if}
+
+				<button type="submit" class="finalize-btn">CONFIRMAR FINALIZACIÓN</button>
+			</form>
+		{:else}
+			<!-- AI2: completion form. Posts to this page's own finalize action
 			(params.batchId is authoritative, so no UUID travels in the form).
 			The unit is shown read-only and sent hidden; only the quantity is
 			operator-controlled. -->
-		<form method="POST" action="?/finalize" use:enhance={preventDoubleSubmit} class="finalize-form">
-			<p class="qty-label">Cantidad realizada</p>
-			<div class="qty-row">
-				<button
-					type="button"
-					class="qty-btn"
-					onclick={() => stepQuantity(-1)}
-					aria-label="Disminuir"
-				>
-					−
-				</button>
-				<input
-					type="number"
-					name="actual_quantity"
-					id="actual_quantity"
-					class="qty-input"
-					bind:value={quantity}
-					step="any"
-					min="0"
-					inputmode="decimal"
-				/>
-				<button type="button" class="qty-btn" onclick={() => stepQuantity(1)} aria-label="Aumentar">
-					+
-				</button>
-			</div>
-			<p class="qty-unit">{data.unit}</p>
-			<input type="hidden" name="unit" value={data.unit} />
+			<form
+				method="POST"
+				action="?/finalize"
+				use:enhance={preventDoubleSubmit}
+				class="finalize-form"
+			>
+				<p class="qty-label">Cantidad realizada</p>
+				<div class="qty-row">
+					<button
+						type="button"
+						class="qty-btn"
+						onclick={() => stepQuantity(-1)}
+						aria-label="Disminuir"
+					>
+						−
+					</button>
+					<input
+						type="number"
+						name="actual_quantity"
+						id="actual_quantity"
+						class="qty-input"
+						bind:value={quantity}
+						step="any"
+						min="0"
+						inputmode="decimal"
+					/>
+					<button
+						type="button"
+						class="qty-btn"
+						onclick={() => stepQuantity(1)}
+						aria-label="Aumentar"
+					>
+						+
+					</button>
+				</div>
+				<p class="qty-unit">{data.unit}</p>
+				<input type="hidden" name="unit" value={data.unit} />
 
-			{#if form?.error}
-				<p class="error" role="alert">{form.error}</p>
-			{/if}
+				{#if form?.error}
+					<p class="error" role="alert">{form.error}</p>
+				{/if}
 
-			<button type="submit" class="finalize-btn">CONFIRMAR FINALIZACIÓN</button>
-		</form>
+				<button type="submit" class="finalize-btn">CONFIRMAR FINALIZACIÓN</button>
+			</form>
+		{/if}
 	{/if}
 </main>
 
@@ -201,6 +259,46 @@
 		text-align: center;
 		font-size: 0.9375rem;
 		color: var(--color-text-muted);
+	}
+
+	.output {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 12px 14px;
+		margin-bottom: 10px;
+	}
+
+	.output-name {
+		margin: 0 0 8px;
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--color-text);
+	}
+
+	.output-input {
+		width: 100%;
+		min-height: var(--touch-min);
+		font-size: 1.5rem;
+		font-weight: 700;
+		text-align: center;
+		color: var(--color-text);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		box-sizing: border-box;
+		-moz-appearance: textfield;
+		appearance: textfield;
+	}
+
+	.output-input::-webkit-outer-spin-button,
+	.output-input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	.output .qty-unit {
+		margin: 6px 0 0;
 	}
 
 	.error {
