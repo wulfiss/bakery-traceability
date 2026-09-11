@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { preventDoubleSubmit } from '$lib/forms';
 	import type { ActionData, PageData } from './$types';
+	import type { RequestItem } from './+page.server';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -11,17 +12,33 @@
 		afternoon: 'TARDE',
 		night: 'NOCHE'
 	};
+
+	// AN1: Spanish label for one source contribution inside a product group.
+	function contributionLabel(item: RequestItem): string {
+		if (item.sourceType === 'base') return 'Producción base';
+		if (item.sourceType === 'external_order') {
+			return item.orderNumber ? `Pedido ${item.orderNumber}` : 'Pedido externo';
+		}
+		return 'Producción adicional';
+	}
 </script>
 
 <main class="page">
 	{#if data.shift === null}
-		<h1>Producción</h1>
-		<p class="prompt">Seleccioná el turno</p>
-		<form method="POST" action={resolve('/production?/select')} class="shifts">
-			<button type="submit" name="shift" value="morning" class="shift-btn">MAÑANA</button>
-			<button type="submit" name="shift" value="afternoon" class="shift-btn">TARDE</button>
-			<button type="submit" name="shift" value="night" class="shift-btn">NOCHE</button>
-		</form>
+		<h1>Producción de hoy</h1>
+		<p class="prompt">Elegí el turno que estás trabajando.</p>
+		<div class="shifts">
+			{#each ['morning', 'afternoon', 'night'] as shift (shift)}
+				<form
+					method="POST"
+					action={resolve('/production?/select')}
+					use:enhance={preventDoubleSubmit}
+				>
+					<input type="hidden" name="shift" value={shift} />
+					<button type="submit" class="shift-btn">{shiftLabels[shift]}</button>
+				</form>
+			{/each}
+		</div>
 	{:else}
 		<h1>Producción de hoy</h1>
 
@@ -29,10 +46,10 @@
 			<div class="error" role="alert">
 				<p>{form.error}</p>
 				{#if form.missingLots && form.missingLots.length > 0}
-					<p class="error-sub">Falta lote activo:</p>
+					<p class="error-sub">Faltan lotes de materia prima:</p>
 					<ul>
-						{#each form.missingLots as name (name)}
-							<li>- {name}</li>
+						{#each form.missingLots as lot (lot)}
+							<li>{lot}</li>
 						{/each}
 					</ul>
 				{/if}
@@ -41,98 +58,50 @@
 
 		<div class="shift-line">
 			<span>Turno: {shiftLabels[data.shift]}</span>
-			<form method="POST" action={resolve('/production?/change')}>
+			<form method="POST" action={resolve('/production?/change')} use:enhance={preventDoubleSubmit}>
 				<button type="submit" class="change-shift">Cambiar turno</button>
 			</form>
 		</div>
 
 		<p class="progress">{data.progress.completed} / {data.progress.total} completadas</p>
 
-		<section class="section">
-			<h2>Producción base</h2>
-			{#if data.base.length === 0}
-				<p class="empty">Sin producción base para este turno.</p>
-			{:else}
-				<ul class="items">
-					{#each data.base as item (item.id)}
-						<li class="item">
-							<span class="item-info">
-								<span class="product">{item.productName}</span>
-								<span class="qty">{item.quantity} {item.unit}</span>
-							</span>
-							{#if item.status === 'pending'}
-								<form
-									method="POST"
-									action={resolve('/production?/start')}
-									use:enhance={preventDoubleSubmit}
-								>
-									<input type="hidden" name="request_id" value={item.id} />
-									<button type="submit" class="start-btn">INICIAR</button>
-								</form>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			{/if}
-		</section>
+		{#if data.groups.length === 0}
+			<p class="empty">Sin producciones para este turno.</p>
+		{:else}
+			<ul class="groups">
+				{#each data.groups as group (group.productId)}
+					<li class="group">
+						<h2 class="group-name">{group.productName}</h2>
+						<ul class="contributions">
+							{#each group.items as item (item.id)}
+								<li class="contribution">
+									<span class="contribution-label">{contributionLabel(item)}</span>
+									<span class="qty">{item.quantity} {item.unit}</span>
+									{#if item.status === 'pending'}
+										<form
+											method="POST"
+											action={resolve('/production?/start')}
+											use:enhance={preventDoubleSubmit}
+										>
+											<input type="hidden" name="request_id" value={item.id} />
+											<button type="submit" class="start-btn">INICIAR</button>
+										</form>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+						{#if group.total !== null}
+							<p class="group-total">
+								<span>TOTAL</span>
+								<span>{group.total}{group.totalUnit ? ` ${group.totalUnit}` : ''}</span>
+							</p>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+		{/if}
 
-		<section class="section">
-			<h2>Pedidos externos</h2>
-			{#if data.external.length === 0}
-				<p class="empty">Sin pedidos externos para este turno.</p>
-			{:else}
-				<ul class="items">
-					{#each data.external as item (item.id)}
-						<li class="item">
-							<span class="item-info">
-								<span class="product">{item.productName}</span>
-								<span class="qty">{item.quantity} {item.unit}</span>
-							</span>
-							{#if item.status === 'pending'}
-								<form
-									method="POST"
-									action={resolve('/production?/start')}
-									use:enhance={preventDoubleSubmit}
-								>
-									<input type="hidden" name="request_id" value={item.id} />
-									<button type="submit" class="start-btn">INICIAR</button>
-								</form>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			{/if}
-		</section>
-
-		<section class="section">
-			<h2>Producción adicional</h2>
-			{#if data.additional.length === 0}
-				<p class="empty">Sin producción adicional para este turno.</p>
-			{:else}
-				<ul class="items">
-					{#each data.additional as item (item.id)}
-						<li class="item">
-							<span class="item-info">
-								<span class="product">{item.productName}</span>
-								<span class="qty">{item.quantity} {item.unit}</span>
-							</span>
-							{#if item.status === 'pending'}
-								<form
-									method="POST"
-									action={resolve('/production?/start')}
-									use:enhance={preventDoubleSubmit}
-								>
-									<input type="hidden" name="request_id" value={item.id} />
-									<button type="submit" class="start-btn">INICIAR</button>
-								</form>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			{/if}
-			<a class="add-button" href={resolve('/production/additional')}>Agregar producción adicional</a
-			>
-		</section>
+		<a class="add-button" href={resolve('/production/additional')}>Agregar producción adicional</a>
 	{/if}
 </main>
 
@@ -208,41 +177,59 @@
 		cursor: pointer;
 	}
 
-	.section {
-		margin-bottom: 20px;
-	}
-
-	h2 {
-		font-size: 1.0625rem;
-		margin: 0 0 8px;
-	}
-
-	.items {
+	.groups {
 		list-style: none;
-		margin: 0;
+		margin: 0 0 20px;
 		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: 12px;
 	}
 
-	.item {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 8px;
+	.group {
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius);
 		padding: 12px 14px;
 	}
 
-	.item-info {
+	.group-name {
+		font-size: 1.0625rem;
+		margin: 0 0 8px;
+	}
+
+	.contributions {
+		list-style: none;
+		margin: 0;
+		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 6px;
+	}
+
+	.contribution {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.contribution-label {
 		flex: 1;
 		min-width: 0;
+		font-size: 0.9rem;
+		color: var(--color-text-muted);
+	}
+
+	.group-total {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		margin: 10px 0 0;
+		padding-top: 8px;
+		border-top: 1px solid var(--color-border);
+		font-size: 0.95rem;
+		font-weight: 700;
 	}
 
 	.start-btn {
@@ -283,10 +270,6 @@
 		padding-left: 18px;
 	}
 
-	.product {
-		font-size: 0.95rem;
-	}
-
 	.qty {
 		font-size: 0.9375rem;
 		color: var(--color-text-muted);
@@ -294,7 +277,7 @@
 	}
 
 	.empty {
-		margin: 0;
+		margin: 0 0 20px;
 		color: var(--color-text-muted);
 		font-size: 0.9375rem;
 	}

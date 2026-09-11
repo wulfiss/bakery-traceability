@@ -9,16 +9,41 @@ const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 // inferred select type in this toolchain (see AGENTS.md).
 type ProductionRequestLite = Pick<
 	Database['public']['Tables']['production_requests']['Row'],
-	'id' | 'source_type' | 'product_id' | 'requested_quantity' | 'unit' | 'status'
+	| 'id'
+	| 'source_type'
+	| 'product_id'
+	| 'requested_quantity'
+	| 'unit'
+	| 'status'
+	| 'external_order_item_id'
 >;
 type ProductLite = Pick<Database['public']['Tables']['products']['Row'], 'id' | 'name'>;
+type OrderItemLite = Pick<
+	Database['public']['Tables']['external_order_items']['Row'],
+	'id' | 'external_order_id'
+>;
+type ExternalOrderLite = Pick<
+	Database['public']['Tables']['external_orders']['Row'],
+	'id' | 'order_number'
+>;
 
 export type RequestItem = {
 	id: string;
+	productId: string;
+	sourceType: Database['public']['Tables']['production_requests']['Row']['source_type'];
+	orderNumber: string | null;
 	productName: string;
 	quantity: number;
 	unit: string;
 	status: Database['public']['Tables']['production_requests']['Row']['status'];
+};
+
+export type ProductGroup = {
+	productId: string;
+	productName: string;
+	items: RequestItem[];
+	total: number | null;
+	totalUnit: string | null;
 };
 
 export const load: PageServerLoad = async (event) => {
@@ -47,14 +72,14 @@ export const load: PageServerLoad = async (event) => {
 	const shift: Shift | null = SHIFTS.includes(cookieValue as Shift) ? (cookieValue as Shift) : null;
 
 	// 7. Load ONLY today's requests matching the selected shift.
-	const base: RequestItem[] = [];
-	const external: RequestItem[] = [];
-	const additional: RequestItem[] = [];
+	const groups: ProductGroup[] = [];
 
 	if (shift) {
 		const requestsResult = await supabase
 			.from('production_requests')
-			.select('id, source_type, product_id, requested_quantity, unit, status')
+			.select(
+				'id, source_type, product_id, requested_quantity, unit, status, external_order_item_id'
+			)
 			.eq('production_day_id', productionDayId)
 			.eq('shift_code', shift);
 		if (requestsResult.error) throw requestsResult.error;
@@ -68,30 +93,93 @@ export const load: PageServerLoad = async (event) => {
 			products.map((product) => [product.id, product.name])
 		);
 
+		// Resolve external order numbers so each external-order contribution
+		// can be labelled "Pedido <order number>" (AN1, presentation only).
+		const orderNumberByItem = new Map<string, string>();
+		const orderItemIds = requests
+			.filter((r) => r.source_type === 'external_order' && r.external_order_item_id)
+			.map((r) => r.external_order_item_id as string);
+		if (orderItemIds.length > 0) {
+			const itemsResult = await supabase
+				.from('external_order_items')
+				.select('id, external_order_id')
+				.in('id', orderItemIds);
+			if (itemsResult.error) throw itemsResult.error;
+			const orderItems: OrderItemLite[] = itemsResult.data ?? [];
+			const orderIds = [...new Set(orderItems.map((item) => item.external_order_id))];
+			const ordersResult = await supabase
+				.from('external_orders')
+				.select('id, order_number')
+				.in('id', orderIds);
+			if (ordersResult.error) throw ordersResult.error;
+			const orders: ExternalOrderLite[] = ordersResult.data ?? [];
+			const orderNumberById = new Map<string, string>(
+				orders.map((order) => [order.id, order.order_number])
+			);
+			for (const orderItem of orderItems) {
+				const number = orderNumberById.get(orderItem.external_order_id);
+				if (number) orderNumberByItem.set(orderItem.id, number);
+			}
+		}
+
+		// Flat list with one entry per request (each stays independently
+		// startable; no allocation or combined-batch logic is introduced).
+		const flat: RequestItem[] = [];
 		for (const request of requests) {
-			const item: RequestItem = {
+			flat.push({
 				id: request.id,
+				productId: request.product_id,
+				sourceType: request.source_type,
+				orderNumber:
+					request.source_type === 'external_order' && request.external_order_item_id
+						? (orderNumberByItem.get(request.external_order_item_id) ?? null)
+						: null,
 				productName: productNames.get(request.product_id) ?? '—',
 				quantity: request.requested_quantity,
 				unit: request.unit,
 				status: request.status
-			};
-			if (request.source_type === 'base') base.push(item);
-			else if (request.source_type === 'external_order') external.push(item);
-			else additional.push(item);
+			});
 		}
+
+		// AN1: group by product. The page already filters to a single shift,
+		// so grouping by product is equivalent to grouping by product + shift.
+		const byProduct = new Map<string, RequestItem[]>();
+		for (const item of flat) {
+			const list = byProduct.get(item.productId) ?? [];
+			list.push(item);
+			byProduct.set(item.productId, list);
+		}
+
+		const SOURCE_ORDER: Record<string, number> = { base: 0, external_order: 1, additional: 2 };
+
+		for (const [productId, items] of byProduct) {
+			items.sort((a, b) => (SOURCE_ORDER[a.sourceType] ?? 3) - (SOURCE_ORDER[b.sourceType] ?? 3));
+			// Only show a total when every contribution shares the same unit;
+			// summing different units would invent a quantity that does not
+			// exist, so the total is omitted instead.
+			const sameUnit = new Set(items.map((item) => item.unit)).size === 1;
+			groups.push({
+				productId,
+				productName: items[0].productName,
+				items,
+				total: sameUnit ? items.reduce((sum, item) => sum + item.quantity, 0) : null,
+				totalUnit: sameUnit ? items[0].unit : null
+			});
+		}
+
+		groups.sort((a, b) => a.productName.localeCompare(b.productName, 'es'));
 	}
 
 	// 8. AJ1: shift progress, computed in memory from the requests loaded
 	// above and never stored in the DB. "total" counts every request of the
 	// selected shift; "completed" counts those with status 'completed'.
-	const all = [...base, ...external, ...additional];
+	const all = groups.flatMap((group) => group.items);
 	const progress = {
 		completed: all.filter((item) => item.status === 'completed').length,
 		total: all.length
 	};
 
-	return { shift, base, external, additional, progress };
+	return { shift, groups, progress };
 };
 
 export const actions: Actions = {
