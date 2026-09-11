@@ -72,12 +72,29 @@ Table mutation classification:
   - require `auth.uid()` to be non-null,
   - validate the caller's `profiles` row is `active` (and role where needed),
   - set an explicit safe `search_path`,
-  - `REVOKE EXECUTE FROM PUBLIC`, and
+  - `REVOKE EXECUTE FROM PUBLIC` (and from the app roles, see the U4 finding
+    below), and
   - `GRANT EXECUTE` only to the minimum required Postgres role.
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit
+## Audit (U4)
 
-- U4 audits every RPC created so far against this checklist and records the
-  permission model per function.
+Functions in schema `public` at the time of the U4 audit:
+
+| Function                               | Kind                                                                                                | Security                                   | Execute granted to                 |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------ | ---------------------------------- |
+| `reject_parent_batch_self_reference()` | BEFORE INSERT/UPDATE trigger guard on `parent_batch_inputs` (a batch cannot consume its own output) | INVOKER (deliberate: pure read-only guard) | `postgres` (owner), `service_role` |
+
+Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
+
+- Supabase's default privileges **explicitly grant EXECUTE to `anon`,
+  `authenticated` and `service_role` for every function `postgres` creates**
+  (visible in `pg_proc.proacl`), independent of `PUBLIC`.
+- The trigger guard lost EXECUTE for `anon` and `authenticated`; it is only
+  executable by the role that can write `parent_batch_inputs` (the trigger
+  fires with the privileges of the inserting role).
+- Rule for every future RPC migration: include explicit `REVOKE EXECUTE` for
+  `anon`/`authenticated` (and `PUBLIC`) and grant only the minimum role. If a
+  role needs to fire the trigger by writing the table, that same migration
+  must grant EXECUTE explicitly.
