@@ -970,6 +970,16 @@ export type Database = {
         }
         Returns: string
       }
+      create_production_plan_item: {
+        Args: {
+          p_planned_quantity: number
+          p_product_id: string
+          p_shift_code: string
+          p_unit: string
+          p_weekday: number
+        }
+        Returns: string
+      }
       create_raw_material: {
         Args: { p_default_unit: string; p_name: string }
         Returns: string
@@ -994,6 +1004,10 @@ export type Database = {
         Returns: string
       }
       set_product_active: {
+        Args: { p_active: boolean; p_id: string }
+        Returns: string
+      }
+      set_production_plan_item_active: {
         Args: { p_active: boolean; p_id: string }
         Returns: string
       }
@@ -1022,6 +1036,17 @@ export type Database = {
           p_default_unit: string
           p_id: string
           p_name: string
+        }
+        Returns: string
+      }
+      update_production_plan_item: {
+        Args: {
+          p_id: string
+          p_planned_quantity: number
+          p_product_id: string
+          p_shift_code: string
+          p_unit: string
+          p_weekday: number
         }
         Returns: string
       }

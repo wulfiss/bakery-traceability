@@ -21,6 +21,9 @@
 		<li>
 			<a href={resolve('/admin/recipes')}>Recetas</a>
 		</li>
+		<li>
+			<a href={resolve('/admin/planning')}>Planificación</a>
+		</li>
 	</ul>
 </main>
 
