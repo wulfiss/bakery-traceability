@@ -15,6 +15,9 @@
 		<li>
 			<a href={resolve('/admin/brands')}>Marcas</a>
 		</li>
+		<li>
+			<a href={resolve('/admin/products')}>Productos</a>
+		</li>
 	</ul>
 </main>
 

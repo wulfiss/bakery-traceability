@@ -962,6 +962,14 @@ export type Database = {
         }
         Returns: string
       }
+      create_product: {
+        Args: {
+          p_default_shift_code: string
+          p_default_unit: string
+          p_name: string
+        }
+        Returns: string
+      }
       create_raw_material: {
         Args: { p_default_unit: string; p_name: string }
         Returns: string
@@ -984,6 +992,10 @@ export type Database = {
         Args: { p_active: boolean; p_id: string }
         Returns: string
       }
+      set_product_active: {
+        Args: { p_active: boolean; p_id: string }
+        Returns: string
+      }
       set_raw_material_active: {
         Args: { p_active: boolean; p_id: string }
         Returns: string
@@ -999,6 +1011,15 @@ export type Database = {
         }
       }
       update_brand: { Args: { p_id: string; p_name: string }; Returns: string }
+      update_product: {
+        Args: {
+          p_default_shift_code: string
+          p_default_unit: string
+          p_id: string
+          p_name: string
+        }
+        Returns: string
+      }
       update_raw_material: {
         Args: { p_default_unit: string; p_id: string; p_name: string }
         Returns: string
