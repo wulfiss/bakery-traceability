@@ -76,6 +76,8 @@
 					{/each}
 				</ul>
 			{/if}
+			<a class="add-button" href={resolve('/production/additional')}>Agregar producción adicional</a
+			>
 		</section>
 	{/if}
 </main>
@@ -189,5 +191,20 @@
 		margin: 0;
 		color: var(--color-text-muted);
 		font-size: 0.9375rem;
+	}
+
+	.add-button {
+		display: block;
+		width: 100%;
+		min-height: var(--touch-min);
+		margin-top: 10px;
+		padding: 10px 12px;
+		font-size: 1rem;
+		font-weight: 700;
+		text-align: center;
+		text-decoration: none;
+		color: var(--color-on-primary);
+		background: var(--color-primary);
+		border-radius: var(--radius);
 	}
 </style>

@@ -924,6 +924,18 @@ export type Database = {
         }
         Returns: string
       }
+      create_additional_production_request: {
+        Args: {
+          p_product_id: string
+          p_production_day_id: string
+          p_reason_code: string
+          p_reason_note?: string
+          p_requested_quantity: number
+          p_shift_code: string
+          p_unit: string
+        }
+        Returns: string
+      }
       ensure_base_production_requests: {
         Args: { p_production_day_id: string }
         Returns: number

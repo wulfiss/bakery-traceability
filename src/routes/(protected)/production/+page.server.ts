@@ -1,12 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { SHIFTS, SHIFT_COOKIE, type Shift } from '$lib/shifts';
 import type { Database } from '$lib/types/database.types';
 
-// The selected shift is a UI preference only (cookie `bakery_shift`).
-// It is never authorization and never inferred from the current time.
-export type Shift = 'morning' | 'afternoon' | 'night';
-const SHIFTS: Shift[] = ['morning', 'afternoon', 'night'];
-const SHIFT_COOKIE = 'bakery_shift';
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 // Explicit row annotations: supabase-js 2.116 under TS 6 does not resolve the
