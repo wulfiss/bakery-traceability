@@ -1,14 +1,92 @@
+<script lang="ts">
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+
+	// Formats a YYYY-MM-DD date as DD/MM/YYYY for the Spanish UI.
+	const formatDate = (iso: string | null): string | null => {
+		if (!iso) return null;
+		const parts = iso.slice(0, 10).split('-');
+		if (parts.length !== 3) return null;
+		return `${parts[2]}/${parts[1]}/${parts[0]}`;
+	};
+</script>
+
 <main class="page">
-	<h1>Lotes</h1>
-	<p class="placeholder">El contenido de esta sección se construirá en las próximas fases.</p>
+	<h1>Materias primas en uso</h1>
+
+	{#if data.items.length === 0}
+		<p class="empty">No hay materias primas activas.</p>
+	{:else}
+		<ul class="cards">
+			{#each data.items as item (item.id)}
+				<li class="card">
+					<h2 class="card-name">{item.name}</h2>
+					{#if item.lot}
+						<p class="lot">{item.lot.brandName} · {item.lot.supplierLot}</p>
+						{#if item.lot.expiryDate}
+							<p class="expiry">Vence: {formatDate(item.lot.expiryDate)}</p>
+						{/if}
+					{:else}
+						<p class="no-lot">Sin lote activo</p>
+					{/if}
+				</li>
+			{/each}
+		</ul>
+	{/if}
 </main>
 
 <style>
 	.page {
+		max-width: var(--content-max);
+		margin: 0 auto;
 		padding: 16px;
 	}
 
-	.placeholder {
-		color: #6b7280;
+	h1 {
+		font-size: 1.375rem;
+		margin-bottom: 16px;
+	}
+
+	.cards {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.card {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 14px 16px;
+	}
+
+	.card-name {
+		font-size: 1.0625rem;
+		margin: 0 0 6px;
+	}
+
+	.lot {
+		margin: 0;
+		font-size: 0.9375rem;
+	}
+
+	.expiry {
+		margin: 4px 0 0;
+		font-size: 0.8125rem;
+		color: var(--color-text-muted);
+	}
+
+	.no-lot {
+		margin: 0;
+		font-size: 0.9375rem;
+		color: var(--color-text-muted);
+	}
+
+	.empty {
+		color: var(--color-text-muted);
 	}
 </style>
