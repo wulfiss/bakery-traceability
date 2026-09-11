@@ -1,0 +1,123 @@
+/* Global styles for a mobile-first operational application. */
+
+:root {
+	--color-bg: #f4f3ef;
+	--color-surface: #ffffff;
+	--color-text: #21262f;
+	--color-text-muted: #5c6570;
+	--color-primary: #2f5d50;
+	--color-on-primary: #ffffff;
+	--color-border: #d9dce1;
+	--color-danger: #b23b2e;
+	--radius: 10px;
+	--touch-min: 44px;
+	--content-max: 480px;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--color-bg);
+	color: var(--color-text);
+	font-family:
+		system-ui,
+		-apple-system,
+		'Segoe UI',
+		Roboto,
+		'Helvetica Neue',
+		Arial,
+		sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+main {
+	max-width: var(--content-max);
+	margin: 0 auto;
+	padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+}
+
+h1,
+h2,
+h3 {
+	line-height: 1.25;
+	margin: 0 0 12px;
+}
+
+p {
+	margin: 0 0 16px;
+}
+
+a {
+	color: var(--color-primary);
+}
+
+label {
+	display: block;
+	font-size: 0.9rem;
+	color: var(--color-text-muted);
+	margin-bottom: 4px;
+}
+
+button,
+input,
+select,
+textarea {
+	font: inherit;
+	color: inherit;
+	max-width: 100%;
+}
+
+button {
+	min-height: var(--touch-min);
+	padding: 10px 16px;
+	border: 1px solid transparent;
+	border-radius: var(--radius);
+	background: var(--color-primary);
+	color: var(--color-on-primary);
+	cursor: pointer;
+}
+
+button:active {
+	opacity: 0.85;
+}
+
+button.secondary {
+	background: var(--color-surface);
+	color: var(--color-text);
+	border-color: var(--color-border);
+}
+
+input,
+select,
+textarea {
+	min-height: var(--touch-min);
+	padding: 10px 12px;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	background: var(--color-surface);
+}
+
+@media (min-width: 768px) {
+	main {
+		padding-top: 48px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation: none !important;
+		transition: none !important;
+	}
+}
