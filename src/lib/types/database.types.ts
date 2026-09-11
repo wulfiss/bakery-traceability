@@ -915,6 +915,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_external_order_item: {
+        Args: {
+          p_external_order_id: string
+          p_notes: string
+          p_product_id: string
+          p_quantity: number
+          p_shift_code: string
+          p_unit: string
+        }
+        Returns: string
+      }
       change_current_material_lot: {
         Args: {
           p_brand_id: string

@@ -24,12 +24,14 @@
 		<ul class="items">
 			{#each data.orders as order (order.id)}
 				<li class="item">
-					<span class="item-info">
-						<span class="order-number">N° {order.orderNumber}</span>
-						<span class="customer">{order.customerName}</span>
-						<span class="date">{order.requestedDate}</span>
-					</span>
-					<span class="status">{statusLabels[order.status]}</span>
+					<a class="item-link" href={resolve(`/admin/external-orders/${order.id}`)}>
+						<span class="item-info">
+							<span class="order-number">N° {order.orderNumber}</span>
+							<span class="customer">{order.customerName}</span>
+							<span class="date">{order.requestedDate}</span>
+						</span>
+						<span class="status">{statusLabels[order.status]}</span>
+					</a>
 				</li>
 			{/each}
 		</ul>
@@ -78,14 +80,20 @@
 	}
 
 	.item {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 8px;
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius);
 		padding: 12px 14px;
+	}
+
+	.item-link {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		min-width: 0;
+		color: inherit;
+		text-decoration: none;
 	}
 
 	.item-info {
