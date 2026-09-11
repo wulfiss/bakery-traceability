@@ -9,6 +9,13 @@ Non-negotiable rules for every agent working in this repository.
 - No ORM (no Prisma, no Drizzle). Plain Supabase JS client and SQL migrations.
 - SvelteKit Form Actions for normal writes; `use:enhance` only when it improves mobile UX.
 - Mobile-first: primary target width 360px–430px.
+- Supabase selects: in this toolchain (supabase-js 2.116 under TypeScript 6) the inferred
+  select result type does not resolve in `svelte-check`, so `await`ed results must have their
+  `.data` explicitly annotated with the selected shape from `src/lib/types/database.types.ts`
+  (e.g. `const lots: Pick<Database['public']['Tables']['material_lots']['Row'], 'id' | ...>[] =
+(await supabase.from('material_lots').select('id, ...')).data ?? []`).
+  `Promise.all` around builders loses the types as well — await queries sequentially.
+  `.returns()`/`.overrideTypes()` do not help (they inherit the unresolved type).
 
 ## Language rules
 
