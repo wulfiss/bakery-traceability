@@ -58,6 +58,7 @@ operations (SECURITY DEFINER RPCs), not browser table writes:
 | Raw materials (admin) | `create_raw_material(...)` / `update_raw_material(...)` / `set_raw_material_active(...)` | created (AL1) |
 | Brands (admin)        | `create_brand(...)` / `update_brand(...)` / `set_brand_active(...)`                      | created (AL2) |
 | Products (admin)      | `create_product(...)` / `update_product(...)` / `set_product_active(...)`                | created (AL3) |
+| Recipes (admin)       | `create_recipe(...)` / `update_recipe(...)` / `set_recipe_active(...)`                   | created (AL4) |
 
 Until the remaining RPCs exist, the write paths are the controlled operations
 above plus the server-side (service role) path used by migrations and seed
@@ -72,15 +73,19 @@ Table mutation classification:
 - **Controlled operational state**: `production_days` (creation only through
   `ensure_production_day`), `production_requests`, `material_lots` (`is_current`
   switch only through `change_current_material_lot`), `production_batches`.
-- **Master data** (admin UI since AL1 for `raw_materials`, AL2 for `brands` and
-  AL3 for `products`; no browser write path for the rest): `raw_materials`
-  (admin-controlled create/edit/soft-deactivate since AL1), `brands`
-  (admin-controlled create/edit/soft-deactivate since AL2; names are NOT
-  uniqueness-constrained — the F2 spec requires only a non-empty name, so
+- **Master data** (admin UI since AL1 for `raw_materials`, AL2 for `brands`,
+  AL3 for `products` and AL4 for `recipes`; no browser write path for the rest):
+  `raw_materials` (admin-controlled create/edit/soft-deactivate since AL1),
+  `brands` (admin-controlled create/edit/soft-deactivate since AL2; names are
+  NOT uniqueness-constrained — the F2 spec requires only a non-empty name, so
   duplicate names are allowed), `products` (admin-controlled create/edit/soft-
   deactivate since AL3; names are NOT uniqueness-constrained — the H1 spec does
   not require it; `default_shift_code` is constrained to morning/afternoon/night),
-  `raw_material_brands`, `recipes`,
+  `recipes` (admin-controlled create/edit/soft-deactivate since AL4; names are
+  NOT uniqueness-constrained — the I1 spec requires only a non-empty name; a
+  recipe may have at most one active version, enforced by a partial unique index
+  on `recipe_versions`),
+  `raw_material_brands`,
   `production_plan_items`. `external_orders` and `external_order_items` have
   controlled creation RPCs since AK2/AK3 (header + items; no editing/cancel yet).
 
@@ -97,7 +102,7 @@ Table mutation classification:
 - Never trust UI-hidden controls; every authorization check is in the database
   or server layer.
 
-## Audit (U4, updated in W2, X0, X1, Y1, Z1, AB1, AD1, AF1, AI1, AK2, AK3, AL1, AL2 and AL3)
+## Audit (U4, updated in W2, X0, X1, Y1, Z1, AB1, AD1, AF1, AI1, AK2, AK3, AL1, AL2, AL3 and AL4)
 
 Functions in schema `public` (current state):
 
@@ -124,6 +129,9 @@ Functions in schema `public` (current state):
 | `create_product(text, text, text)`                                                  | Controlled write RPC (admin master data): trims name/unit (rejects blanks: `invalid_name`, `invalid_unit`); `default_shift_code` must be one of morning/afternoon/night (`invalid_shift`); inserts `products`. Product names are NOT uniqueness-constrained (the H1 spec does not require it — same open decision as brands); admin-only in-body gate (`insufficient_role`)                                                                                                                                                  | DEFINER (deliberate: performs the products insert no app role may do; all auth checks in-body)                                 | `authenticated` only               |
 | `update_product(uuid, text, text, text)`                                            | Controlled write RPC (admin master data): product must exist (`product_not_found`); trims name/unit (rejects blanks: `invalid_name`, `invalid_unit`); `default_shift_code` must be one of morning/afternoon/night (`invalid_shift`); updates name/default_unit/default_shift_code/updated_at; no uniqueness check (see `create_product`); never rewrites historical shift already copied into requests/batches; admin-only in-body gate (`insufficient_role`)                                                                | DEFINER (deliberate: performs the products update no app role may do; all auth checks in-body)                                 | `authenticated` only               |
 | `set_product_active(uuid, boolean)`                                                 | Controlled write RPC (admin master data): product must exist (`product_not_found`); soft toggle of `active` (deactivation sets `active = false`; never a physical delete, because `batch_outputs`, `external_order_items`, `production_plan_items`, `production_requests`, `recipe_product_inputs` and `recipe_products` reference `products` with RESTRICT FKs); admin-only in-body gate (`insufficient_role`)                                                                                                              | DEFINER (deliberate: performs the products update no app role may do; all auth checks in-body)                                 | `authenticated` only               |
+| `create_recipe(text)`                                                               | Controlled write RPC (admin master data): trims name (rejects blanks: `invalid_name`); inserts `recipes`. Recipe names are NOT uniqueness-constrained (the I1 spec requires only a non-empty name — same open decision as brands/products); admin-only in-body gate (`insufficient_role`)                                                                                                                                                                                                                                    | DEFINER (deliberate: performs the recipes insert no app role may do; all auth checks in-body)                                  | `authenticated` only               |
+| `update_recipe(uuid, text)`                                                         | Controlled write RPC (admin master data): recipe must exist (`recipe_not_found`); trims name (rejects blanks: `invalid_name`); updates name/updated_at; no uniqueness check (see `create_recipe`); admin-only in-body gate (`insufficient_role`)                                                                                                                                                                                                                                                                             | DEFINER (deliberate: performs the recipes update no app role may do; all auth checks in-body)                                  | `authenticated` only               |
+| `set_recipe_active(uuid, boolean)`                                                  | Controlled write RPC (admin master data): recipe must exist (`recipe_not_found`); soft toggle of `active` (deactivation sets `active = false`; never a physical delete, because `recipe_versions` and `recipe_products` reference `recipes` with RESTRICT FKs); admin-only in-body gate (`insufficient_role`)                                                                                                                                                                                                                | DEFINER (deliberate: performs the recipes update no app role may do; all auth checks in-body)                                  | `authenticated` only               |
 
 Findings applied by migration `20260911050000_rpc_security_hardening.sql`:
 

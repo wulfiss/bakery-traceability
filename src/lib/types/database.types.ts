@@ -974,6 +974,7 @@ export type Database = {
         Args: { p_default_unit: string; p_name: string }
         Returns: string
       }
+      create_recipe: { Args: { p_name: string }; Returns: string }
       ensure_base_production_requests: {
         Args: { p_production_day_id: string }
         Returns: number
@@ -997,6 +998,10 @@ export type Database = {
         Returns: string
       }
       set_raw_material_active: {
+        Args: { p_active: boolean; p_id: string }
+        Returns: string
+      }
+      set_recipe_active: {
         Args: { p_active: boolean; p_id: string }
         Returns: string
       }
@@ -1024,6 +1029,7 @@ export type Database = {
         Args: { p_default_unit: string; p_id: string; p_name: string }
         Returns: string
       }
+      update_recipe: { Args: { p_id: string; p_name: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never

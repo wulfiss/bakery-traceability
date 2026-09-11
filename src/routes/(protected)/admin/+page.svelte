@@ -18,6 +18,9 @@
 		<li>
 			<a href={resolve('/admin/products')}>Productos</a>
 		</li>
+		<li>
+			<a href={resolve('/admin/recipes')}>Recetas</a>
+		</li>
 	</ul>
 </main>
 
