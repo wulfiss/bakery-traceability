@@ -1,0 +1,2 @@
+weekday,shift_code,product_name,planned_quantity,unit,source,status,notes
+Monday,morning,Baguette,4,latas,V4 §47 Test 2 (test scenario),review_required,"TEST scenario fixture (""Monday planning has Baguette = 4 latas, MAÑANA""), not real planning data. The real weekly production planning source file is not present in the workspace. Current DB production_plan_items is empty (0 rows)."
