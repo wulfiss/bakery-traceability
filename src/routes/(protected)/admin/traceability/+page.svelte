@@ -3,6 +3,9 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	const batchResult = $derived(data.result?.kind === 'batch' ? data.result.batch : null);
+	const lotResult = $derived(data.result?.kind === 'lot' ? data.result.lot : null);
 </script>
 
 <main class="page">
@@ -13,45 +16,43 @@
 			type="text"
 			name="code"
 			class="code-input"
-			placeholder="PAN-100926-M-004"
+			placeholder="PAN-100926-M-004 o H55821"
 			value={data.searchedCode}
 			required
 		/>
 		<button type="submit" class="search-btn">BUSCAR</button>
 	</form>
 
-	{#if data.error}
-		<p class="error">{data.error}</p>
-	{:else if data.batch}
+	{#if batchResult}
 		<div class="result">
 			<ul class="products">
-				{#each data.batch.products as product (product.productId)}
+				{#each batchResult.products as product (product.productId)}
 					<li class="product">
 						<span class="product-name">{product.productName}</span>
 						<span class="product-qty">{product.quantity} {product.unit}</span>
 					</li>
 				{/each}
 			</ul>
-			<p class="batch-code">{data.batch.batchCode}</p>
+			<p class="batch-code">{batchResult.batchCode}</p>
 
 			<div class="meta">
 				<p class="meta-row">
 					<span class="meta-label">Fecha</span>
-					<span>{data.batch.dateLabel}</span>
+					<span>{batchResult.dateLabel}</span>
 				</p>
 				<p class="meta-row">
 					<span class="meta-label">Turno</span>
-					<span>{data.batch.shiftLabel}</span>
+					<span>{batchResult.shiftLabel}</span>
 				</p>
 			</div>
 
 			<section class="materials">
 				<h3>Materias primas</h3>
-				{#if data.batch.materials.length === 0}
+				{#if batchResult.materials.length === 0}
 					<p class="empty">Sin materias primas registradas.</p>
 				{:else}
 					<ul class="material-list">
-						{#each data.batch.materials as material (material.rawMaterialName + material.supplierLot)}
+						{#each batchResult.materials as material (material.rawMaterialName + material.supplierLot)}
 							<li class="material">
 								<span class="material-name">{material.rawMaterialName}</span>
 								<span class="material-brand">{material.brandName}</span>
@@ -62,8 +63,36 @@
 				{/if}
 			</section>
 		</div>
+	{:else if lotResult}
+		<div class="result">
+			<h2 class="lot-name">{lotResult.rawMaterialName}</h2>
+			<p class="lot-head">{lotResult.brandName} · {lotResult.supplierLot}</p>
+
+			<section class="materials">
+				<h3>Utilizada en</h3>
+				{#if lotResult.batches.length === 0}
+					<p class="empty">Sin lotes de producción que usen este lote.</p>
+				{:else}
+					<ul class="material-list">
+						{#each lotResult.batches as item (item.batchCode)}
+							<li class="material">
+								<span class="material-name">{item.batchCode}</span>
+								<span class="material-brand">
+									{#each item.products as product (product.productId)}
+										{product.productName}
+									{/each}
+								</span>
+								<span class="material-lot">Turno {item.shiftLabel} · {item.dateLabel}</span>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</section>
+		</div>
+	{:else if data.error}
+		<p class="error">{data.error}</p>
 	{:else}
-		<p class="prompt">Ingresá el código del lote para ver sus materias primas.</p>
+		<p class="prompt">Ingresá el código del lote de producción o de la materia prima.</p>
 	{/if}
 </main>
 
@@ -161,6 +190,17 @@
 		font-size: 1rem;
 		font-weight: 700;
 		letter-spacing: 0.02em;
+	}
+
+	.lot-name {
+		font-size: 1.1rem;
+		margin: 0 0 4px;
+	}
+
+	.lot-head {
+		font-size: 0.9rem;
+		color: var(--color-text-muted);
+		margin: 0 0 12px;
 	}
 
 	.meta {
