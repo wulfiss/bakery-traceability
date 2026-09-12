@@ -1024,7 +1024,7 @@ export type Database = {
         Returns: string
       }
       start_production_batch: {
-        Args: { p_production_request_id: string }
+        Args: { p_production_request_id: string; p_product_inputs?: Json }
         Returns: Database["public"]["CompositeTypes"]["start_production_batch_result"]
         SetofOptions: {
           from: "*"
