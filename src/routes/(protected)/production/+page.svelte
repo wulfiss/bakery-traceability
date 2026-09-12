@@ -7,6 +7,10 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
+	// AP2: selected source lot per (request, source product) pair. The key is
+	// "<requestId>:<sourceProductId>" and the value the chosen parent output.
+	const selectedLots = $state<Record<string, string>>({});
+
 	const shiftLabels: Record<string, string> = {
 		morning: 'MAÑANA',
 		afternoon: 'TARDE',
@@ -78,14 +82,76 @@
 									<span class="contribution-label">{contributionLabel(item)}</span>
 									<span class="qty">{item.quantity} {item.unit}</span>
 									{#if item.status === 'pending'}
-										<form
-											method="POST"
-											action={resolve('/production?/start')}
-											use:enhance={preventDoubleSubmit}
-										>
-											<input type="hidden" name="request_id" value={item.id} />
-											<button type="submit" class="start-btn">INICIAR</button>
-										</form>
+										{#if group.productInputs.length === 0}
+											<form
+												method="POST"
+												action={resolve('/production?/start')}
+												use:enhance={preventDoubleSubmit}
+											>
+												<input type="hidden" name="request_id" value={item.id} />
+												<button type="submit" class="start-btn">INICIAR</button>
+											</form>
+										{:else}
+											<form
+												method="POST"
+												class="start-form"
+												action={resolve('/production?/start')}
+												use:enhance={preventDoubleSubmit}
+											>
+												<input type="hidden" name="request_id" value={item.id} />
+												<div class="source-inputs">
+													{#each group.productInputs as input (input.sourceProductId)}
+														<div class="source-block">
+															<p class="source-title">Producto de origen</p>
+															<p class="source-name">{input.sourceProductName}</p>
+															{#if input.options.length === 0}
+																<p class="source-empty">Sin lotes disponibles.</p>
+															{:else}
+																<ul class="lots">
+																	{#each input.options as option (option.outputId)}
+																		<li class="lot">
+																			<label class="lot-label">
+																				<input
+																					type="radio"
+																					class="lot-radio"
+																					name={`lot_${item.id}_${input.sourceProductId}`}
+																					value={option.outputId}
+																					bind:group={
+																						selectedLots[`${item.id}:${input.sourceProductId}`]
+																					}
+																					required
+																				/>
+																				<span class="lot-info">
+																					<span class="lot-code">{option.batchCode}</span>
+																					<span class="lot-detail"
+																						>{option.quantity}
+																						{option.unit}{option.dateLabel
+																							? ` · ${option.dateLabel}`
+																							: ''}</span
+																					>
+																				</span>
+																			</label>
+																			{#if selectedLots[`${item.id}:${input.sourceProductId}`] === option.outputId}
+																				<span class="lot-badge">USAR ESTE LOTE</span>
+																			{/if}
+																		</li>
+																	{/each}
+																</ul>
+															{/if}
+														</div>
+													{/each}
+													<button
+														type="submit"
+														class="start-btn"
+														disabled={group.productInputs.some(
+															(input) => input.options.length === 0
+														)}
+													>
+														INICIAR
+													</button>
+												</div>
+											</form>
+										{/if}
 									{/if}
 								</li>
 							{/each}
@@ -210,6 +276,7 @@
 	.contribution {
 		display: flex;
 		align-items: center;
+		flex-wrap: wrap;
 		gap: 8px;
 	}
 
@@ -243,6 +310,114 @@
 		border: none;
 		border-radius: var(--radius);
 		cursor: pointer;
+	}
+
+	.start-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	/* AP2: source-lot selection form (wraps below the contribution line). */
+	.start-form {
+		display: flex;
+		flex-direction: column;
+		flex: 1 0 100%;
+		gap: 10px;
+		margin-top: 6px;
+	}
+
+	.source-inputs {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.source-block {
+		background: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 10px 12px;
+	}
+
+	.source-title {
+		margin: 0 0 2px;
+		font-size: 0.85rem;
+		font-weight: 700;
+		color: var(--color-text-muted);
+	}
+
+	.source-name {
+		margin: 0 0 8px;
+		font-size: 1rem;
+		font-weight: 700;
+	}
+
+	.source-empty {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--color-danger);
+	}
+
+	.lots {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.lot {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.lot-label {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-height: var(--touch-min);
+		padding: 6px 10px;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		cursor: pointer;
+	}
+
+	.lot-radio {
+		flex-shrink: 0;
+		width: 20px;
+		height: 20px;
+		accent-color: var(--color-primary);
+	}
+
+	.lot-info {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+	}
+
+	.lot-code {
+		font-size: 0.95rem;
+		font-weight: 700;
+	}
+
+	.lot-detail {
+		font-size: 0.85rem;
+		color: var(--color-text-muted);
+	}
+
+	.lot-badge {
+		align-self: flex-start;
+		margin-left: 30px;
+		padding: 3px 8px;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		color: var(--color-on-primary);
+		background: var(--color-primary);
+		border-radius: var(--radius);
 	}
 
 	.error {
