@@ -1,29 +1,33 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+
+	// AT: convenience only — admin-only links are hidden for supervisors;
+	// the real gate is the admin layout guard + RPC role checks.
+	const isAdmin = data.role === 'admin';
+
+	const links = [
+		{ label: 'Pedidos externos', href: '/admin/external-orders', adminOnly: false },
+		{ label: 'Materiales', href: '/admin/raw-materials', adminOnly: true },
+		{ label: 'Marcas', href: '/admin/brands', adminOnly: true },
+		{ label: 'Productos', href: '/admin/products', adminOnly: true },
+		{ label: 'Recetas', href: '/admin/recipes', adminOnly: true },
+		{ label: 'Planificación', href: '/admin/planning', adminOnly: true },
+		{ label: 'Trazabilidad', href: '/admin/traceability', adminOnly: true }
+	] as const;
 </script>
 
 <main class="page">
 	<h1>Administración</h1>
 
 	<ul class="links">
-		<li>
-			<a href={resolve('/admin/external-orders')}>Pedidos externos</a>
-		</li>
-		<li>
-			<a href={resolve('/admin/raw-materials')}>Materiales</a>
-		</li>
-		<li>
-			<a href={resolve('/admin/brands')}>Marcas</a>
-		</li>
-		<li>
-			<a href={resolve('/admin/products')}>Productos</a>
-		</li>
-		<li>
-			<a href={resolve('/admin/recipes')}>Recetas</a>
-		</li>
-		<li>
-			<a href={resolve('/admin/planning')}>Planificación</a>
-		</li>
+		{#each links.filter((link) => !link.adminOnly || isAdmin) as link (link.href)}
+			<li>
+				<a href={resolve(link.href)}>{link.label}</a>
+			</li>
+		{/each}
 	</ul>
 </main>
 
