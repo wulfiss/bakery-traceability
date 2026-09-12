@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	<!-- PWA icon source. Render the PNGs (icon-192.png, icon-512.png,
+	     apple-touch-icon.png) from this file with ImageMagick. -->
+	<rect width="512" height="512" fill="#2f5d50"/>
+	<path d="M106 296c0-70 80-104 150-104s150 34 150 104v20c0 18-14 32-32 32H138c-18 0-32-14-32-32z" fill="#ffffff"/>
+	<g stroke="#2f5d50" stroke-width="20" stroke-linecap="round">
+		<line x1="196" y1="240" x2="166" y2="294"/>
+		<line x1="266" y1="230" x2="236" y2="284"/>
+		<line x1="336" y1="240" x2="306" y2="294"/>
+	</g>
+</svg>
