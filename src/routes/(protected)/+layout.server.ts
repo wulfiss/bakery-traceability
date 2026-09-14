@@ -11,6 +11,8 @@ import type { LayoutServerLoad } from './$types';
 // RPC role checks remain the real authorization (AT).
 export const load: LayoutServerLoad = (event) => {
 	if (!event.locals.user || event.locals.profileRole === null) {
-		throw redirect(303, '/login');
+		// V5.6: the login form lives at "/" (not /login, which now only
+		// redirects).
+		throw redirect(303, '/');
 	}
 };
