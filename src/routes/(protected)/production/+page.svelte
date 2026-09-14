@@ -4,7 +4,7 @@
 	import { preventDoubleSubmit } from '$lib/forms';
 	import { SHIFTS } from '$lib/shifts';
 	import type { ActionData, PageData } from './$types';
-	import type { RequestItem } from './+page.server';
+	import type { MissingLot, RequestItem } from './+page.server';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -12,7 +12,7 @@
 	// last form state to all-optional fields for template reads.
 	type FormState = {
 		error?: string | null;
-		missingLots?: string[];
+		missingLots?: MissingLot[];
 		message?: string | null;
 		addLotOpen?: boolean;
 		prefillMaterialId?: string | null;
@@ -89,9 +89,24 @@
 				<p>{f.error}</p>
 				{#if f.missingLots && f.missingLots.length > 0}
 					<p class="error-sub">Faltan lotes de materia prima:</p>
-					<ul>
-						{#each f.missingLots as lot (lot)}
-							<li>{lot}</li>
+					<ul class="missing-lots">
+						{#each f.missingLots as lot, i (i + ':' + lot.name)}
+							<li class="missing-lot-item">
+								<span>{lot.name}</span>
+								<!-- V5.4: open the lot form with this material
+									preselected; after adding the lot the operator
+									presses INICIAR again (no auto-start). -->
+								<form
+									method="POST"
+									action={resolve('/production?/openLot')}
+									use:enhance={preventDoubleSubmit}
+								>
+									{#if lot.materialId}
+										<input type="hidden" name="material_id" value={lot.materialId} />
+									{/if}
+									<button type="submit" class="missing-lot-btn">AGREGAR LOTE</button>
+								</form>
+							</li>
 						{/each}
 					</ul>
 				{/if}
@@ -544,6 +559,35 @@
 	.error ul {
 		margin: 0;
 		padding-left: 18px;
+	}
+
+	/* V5.4: one row per missing material with its AGREGAR LOTE button. */
+	.error ul.missing-lots {
+		list-style: none;
+		padding-left: 0;
+		margin-top: 6px;
+		display: grid;
+		gap: 8px;
+	}
+
+	.missing-lot-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+	}
+
+	.missing-lot-btn {
+		min-height: var(--touch-min);
+		padding: 8px 12px;
+		font-size: 0.9rem;
+		font-weight: 700;
+		color: var(--color-primary);
+		background: var(--color-surface);
+		border: 1px solid var(--color-primary);
+		border-radius: var(--radius);
+		cursor: pointer;
+		white-space: nowrap;
 	}
 
 	.qty {

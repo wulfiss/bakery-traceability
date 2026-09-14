@@ -58,6 +58,15 @@ export type MaterialOption = {
 	brands: BrandLite[];
 };
 
+// V5.4: a raw material reported as missing an open lot by
+// start_production_batch. materialId is null when the name is ambiguous
+// (raw material names are not unique) or could not be resolved; the
+// operator then picks the material in the form.
+export type MissingLot = {
+	name: string;
+	materialId: string | null;
+};
+
 // AP2: one selectable historical lot for a required produced-product input.
 export type SourceLotOption = {
 	outputId: string;
@@ -509,14 +518,38 @@ export const actions: Actions = {
 		if (result.error) {
 			const message = result.error.message;
 			if (message.startsWith('missing_material_lot:')) {
-				const names = message
+				// Explicit annotation: supabase-js 2.116 under TS 6 types
+				// result.error.message as any, so the chain below must be
+				// annotated to stay string[] (see AGENTS.md).
+				const names: string[] = message
 					.slice('missing_material_lot:'.length)
 					.split(',')
 					.map((name: string) => name.trim())
 					.filter((name: string) => name !== '');
+				// V5.4: resolve each missing material name to its id so the
+				// "AGREGAR LOTE" button can preselect it. Names are not unique,
+				// so a name matching more than one active material (or none, if
+				// it became inactive in the meantime) yields a null materialId
+				// and the operator picks the material in the form.
+				const materialsResult = await event.locals.supabase
+					.from('raw_materials')
+					.select('id, name')
+					.eq('active', true);
+				if (materialsResult.error) throw materialsResult.error;
+				const materials: RawMaterialLite[] = materialsResult.data ?? [];
+				const idByName = new Map<string, string[]>();
+				for (const material of materials) {
+					const ids = idByName.get(material.name) ?? [];
+					ids.push(material.id);
+					idByName.set(material.name, ids);
+				}
+				const missing: MissingLot[] = names.map((name) => {
+					const ids = idByName.get(name) ?? [];
+					return { name, materialId: ids.length === 1 ? ids[0] : null };
+				});
 				return fail(400, {
 					error: 'No se puede iniciar la elaboración.',
-					missingLots: names
+					missingLots: missing
 				});
 			}
 			return fail(400, { error: startErrorMessages(message), missingLots: [] });
