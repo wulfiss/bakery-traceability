@@ -43,6 +43,20 @@ type ProductionDayLite = Pick<
 	Database['public']['Tables']['production_days']['Row'],
 	'id' | 'production_date'
 >;
+type RawMaterialLite = Pick<Database['public']['Tables']['raw_materials']['Row'], 'id' | 'name'>;
+type BrandLite = Pick<Database['public']['Tables']['brands']['Row'], 'id' | 'name'>;
+type MaterialBrandLink = Pick<
+	Database['public']['Tables']['raw_material_brands']['Row'],
+	'raw_material_id' | 'brand_id'
+>;
+
+// V5.3: an active raw material with the active brands permitted for it
+// (raw_material_brands), for the "AGREGAR MATERIA PRIMA" form.
+export type MaterialOption = {
+	id: string;
+	name: string;
+	brands: BrandLite[];
+};
 
 // AP2: one selectable historical lot for a required produced-product input.
 export type SourceLotOption = {
@@ -109,6 +123,17 @@ export const load: PageServerLoad = async (event) => {
 	// 4. Read the selected shift from the non-sensitive cookie.
 	const cookieValue = event.cookies.get(SHIFT_COOKIE);
 	const shift: Shift | null = SHIFTS.includes(cookieValue as Shift) ? (cookieValue as Shift) : null;
+
+	// 5. V5.3: stored business date of today's production day, used to prefill
+	// the "Fecha de incorporación" field (never recalculated in the UI).
+	const dayRowResult = await supabase
+		.from('production_days')
+		.select('production_date')
+		.eq('id', productionDayId)
+		.maybeSingle();
+	if (dayRowResult.error) throw dayRowResult.error;
+	const dayRow: ProductionDayLite | null = dayRowResult.data ?? null;
+	const businessDate = dayRow?.production_date ?? '';
 
 	// 7. Load ONLY today's requests matching the selected shift.
 	const groups: ProductGroup[] = [];
@@ -311,7 +336,48 @@ export const load: PageServerLoad = async (event) => {
 		total: all.length
 	};
 
-	return { shift, groups, progress };
+	// 9. V5.3: active raw materials with their permitted active brands, for
+	// the "AGREGAR MATERIA PRIMA" form on this page.
+	// Sequential awaits: Promise.all loses the result types in this
+	// supabase-js version (see AGENTS.md).
+	const materialsResult = await supabase
+		.from('raw_materials')
+		.select('id, name')
+		.eq('active', true)
+		.order('name', { ascending: true });
+	if (materialsResult.error) throw materialsResult.error;
+	const linksResult = await supabase
+		.from('raw_material_brands')
+		.select('raw_material_id, brand_id')
+		.eq('active', true);
+	if (linksResult.error) throw linksResult.error;
+	const brandsResult = await supabase.from('brands').select('id, name').eq('active', true);
+	if (brandsResult.error) throw brandsResult.error;
+
+	const materials: RawMaterialLite[] = materialsResult.data ?? [];
+	const links: MaterialBrandLink[] = linksResult.data ?? [];
+	const brands: BrandLite[] = brandsResult.data ?? [];
+
+	const allowedBrandIds = new Map<string, Set<string>>();
+	for (const link of links) {
+		let ids = allowedBrandIds.get(link.raw_material_id);
+		if (!ids) {
+			ids = new Set();
+			allowedBrandIds.set(link.raw_material_id, ids);
+		}
+		ids.add(link.brand_id);
+	}
+
+	const materialOptions: MaterialOption[] = materials.map((material) => {
+		const allowed = allowedBrandIds.get(material.id) ?? new Set<string>();
+		return {
+			id: material.id,
+			name: material.name,
+			brands: brands.filter((brand) => allowed.has(brand.id))
+		};
+	});
+
+	return { shift, groups, progress, businessDate, materials: materialOptions };
 };
 
 export const actions: Actions = {
@@ -338,6 +404,75 @@ export const actions: Actions = {
 	change: async (event) => {
 		event.cookies.delete(SHIFT_COOKIE, { path: '/' });
 		redirect(303, '/production');
+	},
+
+	// V5.3: open the "AGREGAR MATERIA PRIMA" form. A material_id may be
+	// submitted to preselect it (used by the missing-lot recovery, V5.4).
+	openLot: async (event) => {
+		const formData = await event.request.formData();
+		const materialId =
+			typeof formData.get('material_id') === 'string'
+				? (formData.get('material_id') as string)
+				: '';
+		return {
+			error: null,
+			message: null,
+			addLotOpen: true,
+			prefillMaterialId: materialId || null
+		};
+	},
+
+	// V5.3: add a new material lot from /production. All business rules
+	// (active material/brand, permitted link, non-empty lot, idempotency)
+	// live in the add_material_lot RPC; this action only maps its error
+	// tokens to Spanish user messages.
+	addLot: async (event) => {
+		const formData = await event.request.formData();
+		const materialId = toText(formData.get('material_id'));
+		const brandId = toText(formData.get('brand_id'));
+		const supplierLot = toText(formData.get('supplier_lot'));
+		const openedAt = toText(formData.get('opened_at'));
+
+		const submitted = {
+			material_id: materialId,
+			brand_id: brandId,
+			supplier_lot: supplierLot,
+			opened_at: openedAt
+		};
+
+		if (!materialId || !brandId || !supplierLot) {
+			return fail(400, {
+				error: 'Completa los datos del lote.',
+				message: null,
+				addLotOpen: true,
+				...submitted
+			});
+		}
+
+		const rpcArgs: Database['public']['Functions']['add_material_lot']['Args'] = {
+			p_raw_material_id: materialId,
+			p_brand_id: brandId,
+			p_supplier_lot: supplierLot
+		};
+		// Optional date: omitting the key lets the RPC use the business date.
+		if (openedAt) rpcArgs.p_opened_at = openedAt;
+
+		const { error } = await event.locals.supabase.rpc('add_material_lot', rpcArgs);
+		if (error) {
+			return fail(400, {
+				error: addLotErrorMessages(error.message),
+				message: null,
+				addLotOpen: true,
+				...submitted
+			});
+		}
+
+		return {
+			error: null,
+			message: `Lote ${supplierLot} agregado.`,
+			addLotOpen: false,
+			...submitted
+		};
 	},
 
 	// Start the production batch for one pending request. All business rules
@@ -434,5 +569,29 @@ function startErrorMessages(message: string): string {
 			return 'El turno de esta producción ya no está disponible.';
 		default:
 			return 'No se puede iniciar la elaboración.';
+	}
+}
+
+const toText = (value: string | File | null): string | null =>
+	typeof value === 'string' ? value : null;
+
+// V5.3: add_material_lot error tokens (English, developer-facing) to
+// user-facing Spanish messages.
+function addLotErrorMessages(message: string): string {
+	switch (message) {
+		case 'not_authenticated':
+			return 'No hay sesión iniciada.';
+		case 'no_active_profile':
+			return 'Tu perfil no está activo.';
+		case 'raw_material_not_found':
+			return 'La materia prima seleccionada no existe o no está activa.';
+		case 'brand_not_found':
+			return 'La marca seleccionada no existe o no está activa.';
+		case 'brand_not_permitted_for_material':
+			return 'La marca seleccionada no es válida para esa materia prima.';
+		case 'supplier_lot_required':
+			return 'Ingresa el lote del proveedor.';
+		default:
+			return 'No se pudo agregar el lote.';
 	}
 }

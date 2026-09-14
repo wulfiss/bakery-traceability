@@ -8,9 +8,44 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
+	// The page has several actions with different return shapes; flatten the
+	// last form state to all-optional fields for template reads.
+	type FormState = {
+		error?: string | null;
+		missingLots?: string[];
+		message?: string | null;
+		addLotOpen?: boolean;
+		prefillMaterialId?: string | null;
+		material_id?: string | null;
+		brand_id?: string | null;
+		supplier_lot?: string | null;
+		opened_at?: string | null;
+	};
+	const f: FormState = $derived((form ?? {}) as FormState);
+
 	// AP2: selected source lot per (request, source product) pair. The key is
 	// "<requestId>:<sourceProductId>" and the value the chosen parent output.
 	const selectedLots = $state<Record<string, string>>({});
+
+	// V5.3: "AGREGAR MATERIA PRIMA" form state. The open state is
+	// server-driven (form data) so the missing-lot recovery (V5.4) can reopen
+	// it with a preselected material; the field values stay in the DOM across
+	// use:enhance re-renders.
+	let addLotMaterial = $state<string>(f.prefillMaterialId ?? f.material_id ?? '');
+	let addLotBrand = $state<string>(f.brand_id ?? '');
+	let addLotLot = $state<string>(f.supplier_lot ?? '');
+	let addLotOpenedAt = $state<string>(f.opened_at ?? data.businessDate);
+
+	const addLotMaterialOption = $derived(
+		data.materials.find((material) => material.id === addLotMaterial) ?? null
+	);
+
+	$effect(() => {
+		if (f.addLotOpen && f.prefillMaterialId) {
+			addLotMaterial = f.prefillMaterialId;
+			addLotBrand = '';
+		}
+	});
 
 	// Selection surface: MAÑANA and NOCHE only (afternoon is historical and
 	// can no longer be selected; the TARDE label survives in display maps of
@@ -49,18 +84,21 @@
 	{:else}
 		<h1>Producción de hoy</h1>
 
-		{#if form?.error}
+		{#if f.error}
 			<div class="error" role="alert">
-				<p>{form.error}</p>
-				{#if form.missingLots && form.missingLots.length > 0}
+				<p>{f.error}</p>
+				{#if f.missingLots && f.missingLots.length > 0}
 					<p class="error-sub">Faltan lotes de materia prima:</p>
 					<ul>
-						{#each form.missingLots as lot (lot)}
+						{#each f.missingLots as lot (lot)}
 							<li>{lot}</li>
 						{/each}
 					</ul>
 				{/if}
 			</div>
+		{/if}
+		{#if f.message}
+			<div class="success" role="status">{f.message}</div>
 		{/if}
 
 		<div class="shift-line">
@@ -171,6 +209,66 @@
 		{/if}
 
 		<a class="add-button" href={resolve('/production/additional')}>Agregar producción adicional</a>
+
+		{#if f.addLotOpen}
+			<form
+				method="POST"
+				class="add-lot-form"
+				action={resolve('/production?/addLot')}
+				use:enhance={preventDoubleSubmit}
+			>
+				<h2 class="add-lot-title">Agregar materia prima</h2>
+
+				<label>
+					<span>Materia prima</span>
+					<select name="material_id" bind:value={addLotMaterial} required>
+						<option value="" disabled>Seleccioná una materia prima</option>
+						{#each data.materials as material (material.id)}
+							<option value={material.id}>{material.name}</option>
+						{/each}
+					</select>
+				</label>
+
+				<label>
+					<span>Marca</span>
+					<select name="brand_id" bind:value={addLotBrand} required>
+						<option value="" disabled>Seleccioná una marca</option>
+						{#each addLotMaterialOption?.brands ?? [] as brand (brand.id)}
+							<option value={brand.id}>{brand.name}</option>
+						{/each}
+					</select>
+				</label>
+
+				<label>
+					<span>Lote</span>
+					<input
+						type="text"
+						name="supplier_lot"
+						bind:value={addLotLot}
+						required
+						autocomplete="off"
+					/>
+				</label>
+
+				<label>
+					<span>Fecha de incorporación</span>
+					<input type="date" name="opened_at" bind:value={addLotOpenedAt} />
+				</label>
+
+				<div class="add-lot-actions">
+					<button type="submit" class="submit">CONFIRMAR</button>
+					<a class="secondary" href={resolve('/production')}>CANCELAR</a>
+				</div>
+			</form>
+		{:else}
+			<form
+				method="POST"
+				action={resolve('/production?/openLot')}
+				use:enhance={preventDoubleSubmit}
+			>
+				<button type="submit" class="add-button">+ AGREGAR MATERIA PRIMA</button>
+			</form>
+		{/if}
 	{/if}
 </main>
 
@@ -473,5 +571,92 @@
 		color: var(--color-on-primary);
 		background: var(--color-primary);
 		border-radius: var(--radius);
+		cursor: pointer;
+	}
+
+	.success {
+		color: var(--color-primary);
+		background: var(--color-surface);
+		border: 1px solid var(--color-primary);
+		border-radius: var(--radius);
+		padding: 12px;
+		margin: 0 0 16px;
+		font-size: 0.95rem;
+		font-weight: 700;
+	}
+
+	.add-lot-form {
+		display: block;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 12px 14px;
+		margin-top: 16px;
+	}
+
+	.add-lot-title {
+		font-size: 1.0625rem;
+		margin: 0 0 12px;
+	}
+
+	.add-lot-form label {
+		display: block;
+		margin-bottom: 14px;
+	}
+
+	.add-lot-form label span {
+		display: block;
+		margin-bottom: 6px;
+		font-size: 0.9rem;
+		font-weight: 700;
+		color: var(--color-text-muted);
+	}
+
+	.add-lot-form select,
+	.add-lot-form input {
+		display: block;
+		width: 100%;
+		min-height: var(--touch-min);
+		padding: 10px 12px;
+		font-size: 1rem;
+		color: var(--color-text);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-surface);
+		box-sizing: border-box;
+	}
+
+	.add-lot-actions {
+		display: flex;
+		gap: 10px;
+		margin-top: 6px;
+	}
+
+	.add-lot-actions .submit {
+		flex: 1;
+		display: block;
+		min-height: var(--touch-min);
+		padding: 12px;
+		font-size: 1rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: var(--color-on-primary);
+		background: var(--color-primary);
+		border: none;
+		border-radius: var(--radius);
+		cursor: pointer;
+	}
+
+	.add-lot-actions .secondary {
+		display: inline-block;
+		min-height: var(--touch-min);
+		padding: 12px 16px;
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--color-text-muted);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		text-decoration: none;
 	}
 </style>

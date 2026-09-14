@@ -926,6 +926,15 @@ export type Database = {
         }
         Returns: string
       }
+      add_material_lot: {
+        Args: {
+          p_brand_id: string
+          p_opened_at?: string
+          p_raw_material_id: string
+          p_supplier_lot: string
+        }
+        Returns: string
+      }
       change_current_material_lot: {
         Args: {
           p_brand_id: string
@@ -1024,7 +1033,7 @@ export type Database = {
         Returns: string
       }
       start_production_batch: {
-        Args: { p_production_request_id: string; p_product_inputs?: Json }
+        Args: { p_product_inputs?: Json; p_production_request_id: string }
         Returns: Database["public"]["CompositeTypes"]["start_production_batch_result"]
         SetofOptions: {
           from: "*"
