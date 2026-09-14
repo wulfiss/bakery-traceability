@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { preventDoubleSubmit } from '$lib/forms';
+	import { SHIFTS } from '$lib/shifts';
 	import type { ActionData, PageData } from './$types';
 	import type { RequestItem } from './+page.server';
 
@@ -11,9 +12,11 @@
 	// "<requestId>:<sourceProductId>" and the value the chosen parent output.
 	const selectedLots = $state<Record<string, string>>({});
 
+	// Selection surface: MAÑANA and NOCHE only (afternoon is historical and
+	// can no longer be selected; the TARDE label survives in display maps of
+	// history/traceability pages for old rows).
 	const shiftLabels: Record<string, string> = {
 		morning: 'MAÑANA',
-		afternoon: 'TARDE',
 		night: 'NOCHE'
 	};
 
@@ -32,7 +35,7 @@
 		<h1>Producción de hoy</h1>
 		<p class="prompt">Elegí el turno que estás trabajando.</p>
 		<div class="shifts">
-			{#each ['morning', 'afternoon', 'night'] as shift (shift)}
+			{#each SHIFTS as shift (shift)}
 				<form
 					method="POST"
 					action={resolve('/production?/select')}

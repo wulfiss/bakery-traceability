@@ -87,7 +87,6 @@
 							<label for="shift-{item.id}">Turno</label>
 							<select name="shift" id="shift-{item.id}" value={editShift}>
 								<option value="morning">MAÑANA</option>
-								<option value="afternoon">TARDE</option>
 								<option value="night">NOCHE</option>
 							</select>
 							<label for="product-{item.id}">Producto</label>
@@ -150,7 +149,6 @@
 		<label for="new-shift">Turno</label>
 		<select name="shift" id="new-shift" value={createSeed?.shift ?? 'morning'}>
 			<option value="morning">MAÑANA</option>
-			<option value="afternoon">TARDE</option>
 			<option value="night">NOCHE</option>
 		</select>
 		<label for="new-product">Producto</label>

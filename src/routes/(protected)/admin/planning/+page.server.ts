@@ -46,11 +46,11 @@ type CreateFormValues = {
 type EditFormValues = CreateFormValues & { id: string };
 
 const UUID_RE = /^[0-9a-f-]{36}$/i;
-const SHIFT_CODES = ['morning', 'afternoon', 'night'] as const;
+// V5: MAÑANA and NOCHE only (afternoon is historical, never newly assigned).
+const SHIFT_CODES = ['morning', 'night'] as const;
 
-// Display rank so the list reads MAÑANA, TARDE, NOCHE (alphabetical order of
-// the internal codes would give morning, night, afternoon).
-const SHIFT_RANK: Record<string, number> = { morning: 0, afternoon: 1, night: 2 };
+// Display rank so the list reads MAÑANA, NOCHE.
+const SHIFT_RANK: Record<string, number> = { morning: 0, night: 1 };
 
 export const load: PageServerLoad = async (event) => {
 	const supabase = event.locals.supabase;
@@ -116,7 +116,7 @@ function validatePlanValues(
 		return 'El día debe ser entre lunes y domingo.';
 	}
 	if (!(SHIFT_CODES as readonly string[]).includes(shiftRaw)) {
-		return 'El turno debe ser MAÑANA, TARDE o NOCHE.';
+		return 'El turno debe ser MAÑANA o NOCHE.';
 	}
 	if (!UUID_RE.test(productRaw)) {
 		return 'El producto no existe.';
@@ -296,7 +296,7 @@ function planItemErrorMessages(message: string, fallback: string): string {
 		case 'invalid_weekday':
 			return 'El día debe ser entre lunes y domingo.';
 		case 'invalid_shift':
-			return 'El turno debe ser MAÑANA, TARDE o NOCHE.';
+			return 'El turno debe ser MAÑANA o NOCHE.';
 		case 'invalid_quantity':
 			return 'La cantidad debe ser mayor que cero.';
 		case 'invalid_unit':

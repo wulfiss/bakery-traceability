@@ -17,7 +17,8 @@ export type Product = {
 	active: boolean;
 };
 
-const SHIFT_CODES = ['morning', 'afternoon', 'night'];
+// V5: MAÑANA and NOCHE only (afternoon is historical, never newly assigned).
+const SHIFT_CODES = ['morning', 'night'];
 
 type CreateFormValues = {
 	name: string;
@@ -74,7 +75,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'La unidad no puede estar vacía.', values });
 		}
 		if (!SHIFT_CODES.includes(values.shift)) {
-			return fail(400, { error: 'El turno debe ser MAÑANA, TARDE o NOCHE.', values });
+			return fail(400, { error: 'El turno debe ser MAÑANA o NOCHE.', values });
 		}
 
 		const result = await event.locals.supabase.rpc('create_product', {
@@ -118,7 +119,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'La unidad no puede estar vacía.', values });
 		}
 		if (!SHIFT_CODES.includes(values.shift)) {
-			return fail(400, { error: 'El turno debe ser MAÑANA, TARDE o NOCHE.', values });
+			return fail(400, { error: 'El turno debe ser MAÑANA o NOCHE.', values });
 		}
 
 		const result = await event.locals.supabase.rpc('update_product', {
@@ -197,7 +198,7 @@ function productErrorMessages(message: string, fallback: string): string {
 		case 'invalid_unit':
 			return 'La unidad no puede estar vacía.';
 		case 'invalid_shift':
-			return 'El turno debe ser MAÑANA, TARDE o NOCHE.';
+			return 'El turno debe ser MAÑANA o NOCHE.';
 		default:
 			return fallback;
 	}

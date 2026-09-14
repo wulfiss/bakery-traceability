@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { SHIFTS } from '$lib/shifts';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -19,9 +20,9 @@
 		other: 'Otro'
 	};
 
+	// MAÑANA and NOCHE only: afternoon is historical (see $lib/shifts).
 	const shiftLabels: Record<string, string> = {
 		morning: 'MAÑANA',
-		afternoon: 'TARDE',
 		night: 'NOCHE'
 	};
 
@@ -103,8 +104,8 @@
 			<label for="shift_code">Turno</label>
 			<select id="shift_code" name="shift_code" bind:value={shiftCode} required>
 				<option value="" disabled>Selecciona un turno</option>
-				{#each Object.entries(shiftLabels) as [value, label] (value)}
-					<option {value}>{label}</option>
+				{#each SHIFTS as value (value)}
+					<option {value}>{shiftLabels[value]}</option>
 				{/each}
 			</select>
 		</div>

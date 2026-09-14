@@ -115,7 +115,6 @@
 			<select id="shift_code" name="shift_code" bind:value={shiftCode} required>
 				<option value="" disabled>Seleccionar…</option>
 				<option value="morning">MAÑANA</option>
-				<option value="afternoon">TARDE</option>
 				<option value="night">NOCHE</option>
 			</select>
 

@@ -51,7 +51,8 @@ type ItemFormValues = {
 	notes: string;
 };
 
-const VALID_SHIFTS = ['morning', 'afternoon', 'night'];
+// V5: MAÑANA and NOCHE only (afternoon is historical, never newly assigned).
+const VALID_SHIFTS = ['morning', 'night'];
 const UUID_RE = /^[0-9a-f-]{36}$/i;
 
 export const load: PageServerLoad = async (event) => {

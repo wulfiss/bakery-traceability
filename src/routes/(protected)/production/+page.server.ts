@@ -428,6 +428,10 @@ function startErrorMessages(message: string): string {
 			return 'No hay sesión iniciada.';
 		case 'no_active_profile':
 			return 'Tu perfil no está activo.';
+		case 'invalid_shift':
+			// V5: historical afternoon (TARDE) requests can no longer be
+			// started; no 'T' batch code is ever generated.
+			return 'El turno de esta producción ya no está disponible.';
 		default:
 			return 'No se puede iniciar la elaboración.';
 	}
