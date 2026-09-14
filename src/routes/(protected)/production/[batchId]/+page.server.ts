@@ -18,7 +18,36 @@ type RequestLite = Pick<
 	'id' | 'product_id' | 'requested_quantity' | 'unit'
 >;
 type ProductLite = Pick<Database['public']['Tables']['products']['Row'], 'id' | 'name'>;
-type MaterialRef = Pick<Database['public']['Tables']['batch_materials']['Row'], 'raw_material_id'>;
+type RawMaterialLite = Pick<Database['public']['Tables']['raw_materials']['Row'], 'id' | 'name'>;
+type BrandLite = Pick<Database['public']['Tables']['brands']['Row'], 'id' | 'name'>;
+type MaterialBrandLink = Pick<
+	Database['public']['Tables']['raw_material_brands']['Row'],
+	'raw_material_id' | 'brand_id'
+>;
+// V5.5: one batch_materials row with its embedded lot. The snapshot is
+// append-mostly: the initial lots at batch start plus every additional lot
+// linked while the batch is in progress via "USAR OTRO LOTE".
+type BatchMaterialLotRow = Pick<
+	Database['public']['Tables']['batch_materials']['Row'],
+	'raw_material_id' | 'material_lot_id'
+> & {
+	material_lots: Pick<Database['public']['Tables']['material_lots']['Row'], 'supplier_lot'> | null;
+};
+// V5.5: a raw material the batch uses, with the supplier lots linked to the
+// batch (in incorporation order: the snapshot row first, additions after).
+type BatchMaterial = {
+	id: string;
+	name: string;
+	lots: string[];
+};
+// V5.5: a material the batch already uses, with its permitted active brands,
+// for the "USAR OTRO LOTE" form (the form must not offer materials the batch
+// does not already use).
+type BatchLotOption = {
+	id: string;
+	name: string;
+	brands: BrandLite[];
+};
 type RecipeVersionRef = Pick<
 	Database['public']['Tables']['recipe_versions']['Row'],
 	'id' | 'recipe_id'
@@ -170,23 +199,94 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		}
 	}
 
-	// 3. Whether the material-lot snapshot taken at batch start exists.
-	// The page shows the simple "Materias primas ✓ verificadas" indication
-	// (AH1) and never the per-material list or any UUID.
-	const materialsResult = await supabase
+	// 3. V5.5: the raw materials the batch is using and the exact lots linked
+	// to the batch (created_at order: the start snapshot first, then every
+	// "USAR OTRO LOTE" addition). For a completed batch the list is final
+	// history; the page never shows UUIDs, only names and lot codes.
+	const batchMaterialsResult = await supabase
 		.from('batch_materials')
-		.select('raw_material_id')
-		.eq('batch_id', batchId);
-	if (materialsResult.error) throw materialsResult.error;
-	const materialRefs: MaterialRef[] = materialsResult.data ?? [];
+		.select('raw_material_id, material_lot_id, material_lots(supplier_lot)')
+		.eq('batch_id', batchId)
+		.order('created_at', { ascending: true });
+	if (batchMaterialsResult.error) throw batchMaterialsResult.error;
+	const batchMaterialRows: BatchMaterialLotRow[] = batchMaterialsResult.data ?? [];
+	const batchMaterialIds = [...new Set(batchMaterialRows.map((row) => row.raw_material_id))];
 
-	// 4. AO2: the products the batch's recipe produces. When the recipe yields
+	const lotsByMaterial = new Map<string, string[]>();
+	for (const row of batchMaterialRows) {
+		const lots = lotsByMaterial.get(row.raw_material_id) ?? [];
+		lots.push(row.material_lots?.supplier_lot ?? '—');
+		lotsByMaterial.set(row.raw_material_id, lots);
+	}
+
+	const materialNames = new Map<string, string>();
+	if (batchMaterialIds.length > 0) {
+		const namesResult = await supabase
+			.from('raw_materials')
+			.select('id, name')
+			.in('id', batchMaterialIds);
+		if (namesResult.error) throw namesResult.error;
+		const materials: RawMaterialLite[] = namesResult.data ?? [];
+		for (const material of materials) materialNames.set(material.id, material.name);
+	}
+
+	const batchMaterials: BatchMaterial[] = batchMaterialIds
+		.map((id) => ({
+			id,
+			name: materialNames.get(id) ?? '—',
+			lots: lotsByMaterial.get(id) ?? []
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name));
+
+	// 4. V5.5: "USAR OTRO LOTE" form options for in-progress batches: the
+	// materials the batch already uses, each with its permitted active
+	// brands. Sequential awaits: Promise.all loses the result types in this
+	// supabase-js version (see AGENTS.md).
+	let lotOptions: BatchLotOption[] = [];
+	if (batch.status === 'in_progress' && batchMaterialIds.length > 0) {
+		const linksResult = await supabase
+			.from('raw_material_brands')
+			.select('raw_material_id, brand_id')
+			.eq('active', true)
+			.in('raw_material_id', batchMaterialIds);
+		if (linksResult.error) throw linksResult.error;
+		const links: MaterialBrandLink[] = linksResult.data ?? [];
+		const brandsResult = await supabase.from('brands').select('id, name').eq('active', true);
+		if (brandsResult.error) throw brandsResult.error;
+		const brands: BrandLite[] = brandsResult.data ?? [];
+
+		const allowedBrandIds = new Map<string, Set<string>>();
+		for (const link of links) {
+			let ids = allowedBrandIds.get(link.raw_material_id);
+			if (!ids) {
+				ids = new Set();
+				allowedBrandIds.set(link.raw_material_id, ids);
+			}
+			ids.add(link.brand_id);
+		}
+
+		lotOptions = batchMaterials.map((material) => {
+			const allowed = allowedBrandIds.get(material.id) ?? new Set<string>();
+			return {
+				id: material.id,
+				name: material.name,
+				brands: brands.filter((brand) => allowed.has(brand.id))
+			};
+		});
+	}
+
+	// 5. V5.5: default for the "USAR OTRO LOTE" incorporation date.
+	const businessDateResult = await supabase.rpc('get_business_date');
+	if (businessDateResult.error) throw businessDateResult.error;
+	const businessDate: string = businessDateResult.data ?? '';
+
+	// 6. AO2: the products the batch's recipe produces. When the recipe yields
 	// several products the completion form becomes the multi-output form;
 	// single-product recipes keep the simple single-output form.
 	const recipe = await resolveRecipeProducts(supabase, batchId);
 	const multiOutputs = recipe.products.length > 1 ? recipe.products : null;
 
-	// 5. AO3: what the batch actually produced. Outputs are recorded only at
+	// 7. AO3: what the batch actually produced. Outputs are recorded only at
 	// finalization, so they are fetched only for completed batches; the batch
 	// detail then lists every recorded output (a single-output batch shows one
 	// row, a multi-output batch shows them all).
@@ -213,7 +313,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		productName,
 		quantity,
 		unit,
-		materialsVerified: materialRefs.length > 0,
+		materialsVerified: batchMaterials.length > 0,
+		batchMaterials,
+		lotOptions,
+		businessDate,
 		recipeName: multiOutputs ? recipe.recipeName : null,
 		multiOutputs,
 		outputs
@@ -248,7 +351,76 @@ function finalizeErrorMessages(token: string): string {
 	}
 }
 
+// Spanish messages for the use_other_material_lot error tokens (V5.5).
+function useLotErrorMessages(token: string): string {
+	switch (token) {
+		case 'batch_not_found':
+			return 'El lote no existe.';
+		case 'batch_not_in_progress':
+			return 'El lote ya fue finalizado.';
+		case 'material_not_in_batch':
+			return 'Esa materia prima no se usa en este lote.';
+		case 'raw_material_not_found':
+			return 'La materia prima no existe.';
+		case 'brand_not_found':
+			return 'La marca no existe.';
+		case 'brand_not_permitted_for_material':
+			return 'La marca no está permitida para esa materia prima.';
+		case 'supplier_lot_required':
+			return 'Ingresá el lote del proveedor.';
+		case 'not_authenticated':
+			return 'No hay sesión iniciada.';
+		case 'no_active_profile':
+			return 'Tu perfil no está activo.';
+		default:
+			return 'No se puede agregar el lote.';
+	}
+}
+
 export const actions: Actions = {
+	// V5.5: "USAR OTRO LOTE" — link a second lot of a raw material the batch
+	// is already using (the final-rule case: opening a second bag of flour
+	// mid-dough must be recorded without losing the first lot). The RPC
+	// appends a batch_materials row (never rewrites the existing ones) and
+	// makes the new lot current for future production. The batch identity
+	// comes from the route params (the form is never trusted with it); the
+	// material must be one of the batch's materials (the form is generated
+	// from them and the RPC re-checks). On success the page redirects to
+	// itself so the lot list re-loads.
+	useLot: async ({ request, locals, params }) => {
+		const formData = await request.formData();
+		const batchId: string = params.batchId ?? '';
+		const materialId = formData.get('raw_material_id')?.toString().trim() ?? '';
+		const brandId = formData.get('brand_id')?.toString().trim() ?? '';
+		const supplierLot = formData.get('supplier_lot')?.toString().trim() ?? '';
+		const openedAt = formData.get('opened_at')?.toString().trim() ?? '';
+
+		const fieldData = {
+			raw_material_id: materialId,
+			brand_id: brandId,
+			supplier_lot: supplierLot,
+			opened_at: openedAt
+		};
+
+		if (batchId === '' || materialId === '' || brandId === '' || supplierLot === '') {
+			return fail(400, { error: 'Completa los datos del lote.', ...fieldData });
+		}
+
+		const args: Database['public']['Functions']['use_other_material_lot']['Args'] = {
+			p_batch_id: batchId,
+			p_raw_material_id: materialId,
+			p_brand_id: brandId,
+			p_supplier_lot: supplierLot
+		};
+		if (openedAt !== '') args.p_opened_at = openedAt;
+
+		const { data, error: rpcError } = await locals.supabase.rpc('use_other_material_lot', args);
+		if (rpcError) return fail(400, { error: useLotErrorMessages(rpcError.message), ...fieldData });
+		void data;
+
+		redirect(303, `/production/${batchId}`);
+	},
+
 	// AI2: finalize the batch with the actual produced quantity. The form
 	// posts batch_id, actual_quantity and unit; the RPC performs the whole
 	// completion atomically and we simply redirect back to the production

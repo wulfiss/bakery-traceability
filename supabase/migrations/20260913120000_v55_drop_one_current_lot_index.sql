@@ -1,0 +1,27 @@
+-- Phase V5.5: one production may use multiple lots of the same raw material.
+--
+-- Drop the partial unique index that forbade a second current lot per raw
+-- material. From this phase on, several material lots of the same raw
+-- material may be is_current = true at the same time:
+--
+--   - add_material_lot (phase V5.3) already created its lot with
+--     is_current = true without closing the prior one; while this index
+--     existed, adding a second lot for a material that already had a current
+--     lot failed with a unique violation. With the index dropped, open lots
+--     coexist, and start_production_batch (which snapshots every is_current
+--     lot of each required material) carries all of them into the new batch.
+--
+--   - use_other_material_lot (the companion RPC of this phase, applied
+--     after this migration) links a second lot to an in-progress batch and
+--     retires the material's other current lots, so the next batch defaults
+--     to the newest lot.
+--
+--   - change_current_material_lot keeps its explicit "switch" behavior: its
+--     body already closes every current lot of the material before creating
+--     the new one, so it is unaffected by the dropped index.
+--
+-- Historical traceability is unaffected: batch_materials rows keep the exact
+-- lots each batch used (append-mostly, never rewritten), and historical
+-- traceability never reads is_current.
+
+drop index if exists public.material_lots_one_current_per_raw_material;

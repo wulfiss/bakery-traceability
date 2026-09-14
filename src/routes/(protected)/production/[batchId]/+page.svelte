@@ -34,6 +34,21 @@
 		const next = base + delta;
 		quantity = next > 0 ? String(next) : '0';
 	}
+
+	// V5.5: "USAR OTRO LOTE" form state (in-progress batches only). The
+	// operator must pick one of the materials the batch already uses, a
+	// permitted brand, the new supplier lot and the incorporation date. The
+	// toggle stays client-side; submitted values are re-read from the action
+	// data so they survive a failed submit.
+	let useLotOpen = $state(false);
+	let useLotMaterial = $state<string>(form?.raw_material_id ?? '');
+	let useLotBrand = $state<string>(form?.brand_id ?? '');
+	let useLotLot = $state<string>(form?.supplier_lot ?? '');
+	let useLotOpenedAt = $state<string>(form?.opened_at ?? data.businessDate);
+
+	const useLotMaterialOption = $derived(
+		data.lotOptions.find((option) => option.id === useLotMaterial) ?? null
+	);
 </script>
 
 <main class="page">
@@ -80,12 +95,90 @@
 		</div>
 	{/if}
 
-	<div class="detail">
-		<span class="detail-label">Materias primas</span>
-		<span class="detail-value {data.materialsVerified ? '' : 'muted'}">
-			{data.materialsVerified ? '✓ verificadas' : '—'}
-		</span>
+	<!-- V5.5: the raw materials the batch is using and the exact lots linked
+		to the batch (the start snapshot plus every "USAR OTRO LOTE" addition).
+		For a completed batch this list is final history; the page never shows
+		UUIDs, only names and supplier lot codes. -->
+	<div class="materials">
+		<p class="materials-title">Materias primas</p>
+		{#if data.materialsVerified}
+			{#each data.batchMaterials as material (material.id)}
+				<div class="material">
+					<p class="material-name">{material.name}</p>
+					<ul class="material-lots">
+						{#each material.lots as lot, i (i + ':' + lot)}
+							<li class="material-lot">{lot}</li>
+						{/each}
+					</ul>
+				</div>
+			{/each}
+		{:else}
+			<p class="materials-empty">—</p>
+		{/if}
 	</div>
+
+	{#if data.batch.status === 'in_progress'}
+		<!-- V5.5: mid-dough, the baker can open a second lot of a material the
+			batch already uses (e.g. a second bag of flour). The form only offers
+			the materials the batch already uses; the new lot is appended to the
+			batch's lot list and becomes current for future production. -->
+		{#if useLotOpen}
+			<form method="POST" class="use-lot-form" action="?/useLot" use:enhance={preventDoubleSubmit}>
+				<h2 class="use-lot-title">Usar otro lote</h2>
+
+				<label>
+					<span>Materia prima</span>
+					<select name="raw_material_id" bind:value={useLotMaterial} required>
+						<option value="" disabled>Seleccioná una materia prima</option>
+						{#each data.lotOptions as option (option.id)}
+							<option value={option.id}>{option.name}</option>
+						{/each}
+					</select>
+				</label>
+
+				<label>
+					<span>Marca</span>
+					<select name="brand_id" bind:value={useLotBrand} required>
+						<option value="" disabled>Seleccioná una marca</option>
+						{#each useLotMaterialOption?.brands ?? [] as brand (brand.id)}
+							<option value={brand.id}>{brand.name}</option>
+						{/each}
+					</select>
+				</label>
+
+				<label>
+					<span>Lote</span>
+					<input
+						type="text"
+						name="supplier_lot"
+						bind:value={useLotLot}
+						required
+						autocomplete="off"
+					/>
+				</label>
+
+				<label>
+					<span>Fecha de incorporación</span>
+					<input type="date" name="opened_at" bind:value={useLotOpenedAt} />
+				</label>
+
+				{#if form?.error}
+					<p class="error" role="alert">{form.error}</p>
+				{/if}
+
+				<div class="use-lot-actions">
+					<button type="submit" class="submit">CONFIRMAR</button>
+					<button type="button" class="secondary" onclick={() => (useLotOpen = false)}>
+						CANCELAR
+					</button>
+				</div>
+			</form>
+		{:else}
+			<button type="button" class="add-lot-button" onclick={() => (useLotOpen = true)}>
+				+ USAR OTRO LOTE
+			</button>
+		{/if}
+	{/if}
 
 	{#if data.batch.status === 'in_progress'}
 		{#if data.multiOutputs}
@@ -250,6 +343,142 @@
 
 	.muted {
 		color: var(--color-text-muted);
+	}
+
+	.materials {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 12px 14px;
+		margin-bottom: 8px;
+	}
+
+	.materials-title {
+		margin: 0 0 8px;
+		font-size: 0.9375rem;
+		color: var(--color-text-muted);
+	}
+
+	.materials-empty {
+		margin: 0;
+		font-weight: 700;
+		color: var(--color-text-muted);
+	}
+
+	.material + .material {
+		border-top: 1px solid var(--color-border);
+	}
+
+	.material-name {
+		margin: 10px 0 4px;
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: var(--color-text);
+	}
+
+	.material-lots {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.material-lot {
+		padding: 2px 0;
+		font-size: 0.9375rem;
+		color: var(--color-text);
+	}
+
+	.material-lot::before {
+		content: '- ';
+		color: var(--color-text-muted);
+	}
+
+	.add-lot-button {
+		display: block;
+		width: 100%;
+		min-height: var(--touch-min);
+		margin-top: 10px;
+		padding: 10px 12px;
+		font-size: 1rem;
+		font-weight: 700;
+		text-align: center;
+		color: var(--color-primary);
+		background: var(--color-surface);
+		border: 1px dashed var(--color-primary);
+		border-radius: var(--radius);
+	}
+
+	.use-lot-form {
+		display: block;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 12px 14px;
+		margin-top: 16px;
+	}
+
+	.use-lot-title {
+		font-size: 1.0625rem;
+		margin: 0 0 12px;
+	}
+
+	.use-lot-form label {
+		display: block;
+		margin-bottom: 14px;
+	}
+
+	.use-lot-form label span {
+		display: block;
+		margin-bottom: 6px;
+		font-size: 0.9rem;
+		font-weight: 700;
+		color: var(--color-text-muted);
+	}
+
+	.use-lot-form select,
+	.use-lot-form input {
+		display: block;
+		width: 100%;
+		min-height: var(--touch-min);
+		padding: 10px 12px;
+		font-size: 1rem;
+		color: var(--color-text);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-surface);
+		box-sizing: border-box;
+	}
+
+	.use-lot-actions {
+		display: flex;
+		gap: 10px;
+		margin-top: 6px;
+	}
+
+	.use-lot-actions .submit {
+		flex: 1;
+		display: block;
+		min-height: var(--touch-min);
+		padding: 12px;
+		font-size: 1rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: var(--color-on-primary);
+		background: var(--color-primary);
+		border: none;
+		border-radius: var(--radius);
+	}
+
+	.use-lot-actions .secondary {
+		display: inline-block;
+		min-height: var(--touch-min);
+		padding: 12px 16px;
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--color-text-muted);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
 	}
 
 	.finalize-form {

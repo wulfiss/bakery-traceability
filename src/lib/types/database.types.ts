@@ -1068,6 +1068,16 @@ export type Database = {
         Returns: string
       }
       update_recipe: { Args: { p_id: string; p_name: string }; Returns: string }
+      use_other_material_lot: {
+        Args: {
+          p_batch_id: string
+          p_brand_id: string
+          p_opened_at?: string
+          p_raw_material_id: string
+          p_supplier_lot: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
