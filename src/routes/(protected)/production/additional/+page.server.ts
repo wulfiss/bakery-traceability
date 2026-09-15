@@ -45,21 +45,19 @@ const rpcErrors: Record<string, string> = {
 	product_not_found: 'El producto seleccionado no existe o no está activo.',
 	invalid_quantity: 'La cantidad debe ser mayor que cero.',
 	invalid_unit: 'La unidad no puede estar vacía.',
-	invalid_shift: 'El turno seleccionado no es válido.',
-	invalid_reason: 'El motivo seleccionado no es válido.',
-	reason_note_required: 'Describí el motivo: el campo detalle es obligatorio.'
+	invalid_shift: 'El turno seleccionado no es válido.'
 };
 
 const toText = (value: string | File | null): string | null =>
 	typeof value === 'string' ? value : null;
 
+// V5.7: the additional-production form no longer carries a reason; new
+// requests save reason_code = NULL / reason_note = NULL (the RPC defaults).
 type Submitted = {
 	product_id: string | null;
 	requested_quantity: string | null;
 	unit: string | null;
 	shift_code: string | null;
-	reason_code: string | null;
-	reason_note: string | null;
 };
 
 export const actions: Actions = {
@@ -70,9 +68,7 @@ export const actions: Actions = {
 			product_id: toText(formData.get('product_id')),
 			requested_quantity: toText(formData.get('requested_quantity')),
 			unit: toText(formData.get('unit')),
-			shift_code: toText(formData.get('shift_code')),
-			reason_code: toText(formData.get('reason_code')),
-			reason_note: toText(formData.get('reason_note'))
+			shift_code: toText(formData.get('shift_code'))
 		};
 
 		const quantity =
@@ -82,8 +78,7 @@ export const actions: Actions = {
 			!submitted.product_id ||
 			Number.isNaN(quantity) ||
 			!submitted.unit ||
-			!submitted.shift_code ||
-			!submitted.reason_code
+			!submitted.shift_code
 		) {
 			return fail(400, { error: 'Completa los datos de la producción adicional.', ...submitted });
 		}
@@ -95,17 +90,15 @@ export const actions: Actions = {
 		if (!productionDayId)
 			throw dayResult.error ?? new Error('ensure_production_day returned no id');
 
+		// V5.7: no reason fields are sent; the RPC defaults store NULL/NULL.
 		const rpcArgs: Database['public']['Functions']['create_additional_production_request']['Args'] =
 			{
 				p_production_day_id: productionDayId,
 				p_product_id: submitted.product_id,
 				p_requested_quantity: quantity,
 				p_unit: submitted.unit,
-				p_shift_code: submitted.shift_code,
-				p_reason_code: submitted.reason_code
+				p_shift_code: submitted.shift_code
 			};
-		// Optional note: omitting the key keeps the RPC default (null).
-		if (submitted.reason_note) rpcArgs.p_reason_note = submitted.reason_note;
 
 		const { error } = await event.locals.supabase.rpc(
 			'create_additional_production_request',

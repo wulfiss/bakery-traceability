@@ -956,7 +956,7 @@ export type Database = {
         Args: {
           p_product_id: string
           p_production_day_id: string
-          p_reason_code: string
+          p_reason_code?: string
           p_reason_note?: string
           p_requested_quantity: number
           p_shift_code: string

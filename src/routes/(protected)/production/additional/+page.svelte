@@ -10,15 +10,9 @@
 	let productId = $state(form?.product_id ?? '');
 	let unit = $state(form?.unit ?? '');
 	let shiftCode = $state(form?.shift_code ?? data.shift ?? '');
-	let reasonCode = $state(form?.reason_code ?? '');
-	let reasonNote = $state(form?.reason_note ?? '');
 
-	const reasonLabels: Record<string, string> = {
-		replenishment: 'Reposición',
-		increased_demand: 'Mayor demanda',
-		remake: 'Rehacer producción',
-		other: 'Otro'
-	};
+	// V5.7: no reason (Motivo/Detalle) fields — additional production no
+	// longer asks for a reason.
 
 	// MAÑANA and NOCHE only: afternoon is historical (see $lib/shifts).
 	const shiftLabels: Record<string, string> = {
@@ -75,30 +69,6 @@
 			<label for="unit">Unidad</label>
 			<input id="unit" name="unit" type="text" bind:value={unit} autocomplete="off" required />
 		</div>
-
-		<div class="field">
-			<label for="reason_code">Motivo</label>
-			<select id="reason_code" name="reason_code" bind:value={reasonCode} required>
-				<option value="" disabled>Selecciona un motivo</option>
-				{#each Object.entries(reasonLabels) as [value, label] (value)}
-					<option {value}>{label}</option>
-				{/each}
-			</select>
-		</div>
-
-		{#if reasonCode === 'other'}
-			<div class="field">
-				<label for="reason_note">Detalle</label>
-				<input
-					id="reason_note"
-					name="reason_note"
-					type="text"
-					bind:value={reasonNote}
-					autocomplete="off"
-					required
-				/>
-			</div>
-		{/if}
 
 		<div class="field">
 			<label for="shift_code">Turno</label>
