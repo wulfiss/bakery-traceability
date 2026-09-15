@@ -37,8 +37,12 @@ Non-negotiable rules for every agent working in this repository.
 
 ## Production shifts
 
-- Exactly three internal shift codes: `morning`, `afternoon`, `night`.
-- Spanish UI labels: `MAÑANA`, `TARDE`, `NOCHE`.
+- Operational shifts are `morning` and `night` only: every new request, batch,
+  plan item, product default and external order item must use one of these two
+  codes. `afternoon` survives only in pre-V5 history (the shift CHECK
+  constraints were re-added `NOT VALID`, so historical rows keep their code).
+- Spanish UI labels: `MAÑANA`, `TARDE`, `NOCHE`. `TARDE` remains in the
+  display-only label maps for historical rows; no new UI offers it.
 - The operator selects the shift once when entering Production; it is persisted as a
   non-sensitive UI preference (cookie `bakery_shift`) and is **never** authorization.
 - No formal shift sessions: no clock-in/clock-out, no attendance, no
@@ -53,9 +57,21 @@ Non-negotiable rules for every agent working in this repository.
 - `base` comes from the weekly plan (weekday + shift + product + planned quantity).
 - `external_order` items carry an assigned shift (defaulted from the product,
   overridable by supervisor/admin).
-- `additional` defaults to the currently selected shift and requires `reason_code`
-  (`replenishment`, `increased_demand`, `remake`, `other`); `other` also requires a
-  non-empty `reason_note`. For `base` and `external_order`, reason fields are null.
+- `additional` defaults to the currently selected shift. Since V5.7 the UI no
+  longer asks for a reason and new additional requests save
+  `reason_code = NULL` / `reason_note = NULL`. The columns stay nullable for
+  backward compatibility (historical rows keep their reasons); the RPC still
+  accepts an optional reason — a provided code must be one of
+  `replenishment`, `increased_demand`, `remake`, `other`, and `other` still
+  requires a non-empty `reason_note`. For `base` and `external_order`, reason
+  fields are null.
+
+## Routing
+
+- The login form lives at the root route `/`. `/login` is redirect-only:
+  to `/production` when the visitor is authenticated, to `/` otherwise.
+- Authenticated visitors hitting `/` are redirected to `/production`; the
+  `(protected)` route group redirects unauthenticated visitors to `/`.
 
 ## Traceability rules
 
@@ -63,10 +79,19 @@ Non-negotiable rules for every agent working in this repository.
   (enforced by a partial unique index).
 - A recipe can produce one or multiple products; a produced item can later be an
   input for another batch.
-- At most one material lot may be `is_current = true` per raw material
-  (partial unique index).
+- Multiple material lots of the same raw material may be `is_current = true`
+  at once (the single-current-lot partial unique index was dropped in V5.5).
+  `change_current_material_lot` still closes the other current lots of the
+  material when it opens a new one; `add_material_lot` opens a new current
+  lot without closing the others (that is how coexistence arises);
+  `use_other_material_lot` is the mid-batch "use another lot" path.
+- The operator adds material lots from the production screens (a new lot from
+  `/production` for a batch in progress; current-lot management from `/lots`)
+  through those controlled RPCs — never through direct table writes.
 - When a batch starts, copy the exact current material lots into `batch_materials`
-  (append-mostly / immutable).
+  (append-mostly / immutable). A lot opened mid-batch is appended to the
+  running batch's `batch_materials`; the rows recorded earlier are never
+  rewritten.
 - Never reconstruct historical traceability from `material_lots.is_current`.
 - Production records are never physically deleted; use `active = false`,
   `status = cancelled`, `status = closed`, `status = retired`.
