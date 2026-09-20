@@ -1,0 +1,345 @@
+﻿source_sheet,suggestion_code,source_row,source_text,quantity_candidate,unit_candidate,product_candidate,matched_product_id,shift_candidate,status,notes
+LUNES,A,2,1 latas cara sucia,1,latas,cara sucia,,,review_required,
+LUNES,B,2,1 latas cara sucia,1,latas,cara sucia,,,review_required,
+LUNES,C,2,1 latas cara sucia,1,latas,cara sucia,,,review_required,
+LUNES,D,2,1 latas cara sucia,1,latas,cara sucia,,,review_required,
+LUNES,A,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+LUNES,B,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+LUNES,C,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+LUNES,D,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+LUNES,A,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+LUNES,B,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+LUNES,C,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+LUNES,D,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+LUNES,A,5,6 latas chip,6,latas,chip,,,review_required,
+LUNES,B,5,6 latas chip,6,latas,chip,,,review_required,
+LUNES,C,5,6 latas chip,6,latas,chip,,,review_required,
+LUNES,D,5,6 latas chip,6,latas,chip,,,review_required,
+LUNES,A,6,7 latas Palmerita ,7,latas,palmerita,,,review_required,
+LUNES,B,6,7 latas Palmerita ,7,latas,palmerita,,,review_required,
+LUNES,C,6,7 latas Palmerita ,7,latas,palmerita,,,review_required,
+LUNES,D,6,7 latas Palmerita ,7,latas,palmerita,,,review_required,
+LUNES,A,7,5 latas trencitas ,5,latas,trencitas,,,review_required,
+LUNES,B,7,5 latas trencitas ,5,latas,trencitas,,,review_required,
+LUNES,C,7,5 latas trencitas ,5,latas,trencitas,,,review_required,
+LUNES,D,7,5 latas trencitas ,5,latas,trencitas,,,review_required,
+LUNES,A,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+LUNES,B,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+LUNES,C,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+LUNES,D,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+LUNES,A,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+LUNES,B,9,8 medialunas saladas  ,8,,medialunas saladas,,,review_required,no recognizable unit after quantity
+LUNES,C,9,8 medialunas saladas  ,8,,medialunas saladas,,,review_required,no recognizable unit after quantity
+LUNES,D,9,8 medialunas saladas  ,8,,medialunas saladas,,,review_required,no recognizable unit after quantity
+LUNES,A,10,1 carro pan lactal   ,1,carro,pan lactal,,,review_required,
+LUNES,B,10,1 carro pan lactal salvado ,1,carro,pan lactal salvado,,,review_required,
+LUNES,C,10,1 carro pan lactal salvado ,1,carro,pan lactal salvado,,,review_required,
+LUNES,D,10,1 carro pan lactal salvado ,1,carro,pan lactal salvado,,,review_required,
+LUNES,A,11,1 carro pan lactal integral ,1,carro,pan lactal integral,,,review_required,
+LUNES,B,11,1 carro pan lactal integral ,1,carro,pan lactal integral,,,review_required,
+LUNES,C,11,1 carro pan lactal integral ,1,carro,pan lactal integral,,,review_required,
+LUNES,D,11,1 carro pan lactal integral ,1,carro,pan lactal integral,,,review_required,
+LUNES,A,12,1 miga ,1,miga,miga,,,review_required,'1 miga': 'miga' acts as both unit and product; product = Pan miga (to be created) - §44 review example
+LUNES,B,12,1 miga ,1,miga,miga,,,review_required,'1 miga': 'miga' acts as both unit and product; product = Pan miga (to be created) - §44 review example
+LUNES,C,12,1 miga ,1,miga,miga,,,review_required,'1 miga': 'miga' acts as both unit and product; product = Pan miga (to be created) - §44 review example
+LUNES,D,12,1 miga ,1,miga,miga,,,review_required,'1 miga': 'miga' acts as both unit and product; product = Pan miga (to be created) - §44 review example
+LUNES,A,13,1 carro prepizzas,1,carro,prepizzas,,,review_required,
+LUNES,B,13,1 carro prepizzas,1,carro,prepizzas,,,review_required,
+LUNES,C,13,1 carro prepizzas,1,carro,prepizzas,,,review_required,
+LUNES,D,13,1 carro prepizzas,1,carro,prepizzas,,,review_required,
+MARTES,A,2,1 latas cara sucia,1,latas,cara sucia,,,review_required,
+MARTES,B,2,1 latas cara sucia,1,latas,cara sucia,,,review_required,
+MARTES,C,2,1 latas cara sucia,1,latas,cara sucia,,,review_required,
+MARTES,D,2,1 latas cara sucia,1,latas,cara sucia,,,review_required,
+MARTES,E,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+MARTES,A,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+MARTES,B,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+MARTES,C,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+MARTES,D,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+MARTES,E,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+MARTES,A,4,3 latas baguette ,3,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MARTES,B,4,3 latas baguette ,3,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MARTES,C,4,3 latas baguette ,3,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MARTES,D,4,3 latas baguette ,3,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MARTES,E,4,3 latas baguette ,3,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MARTES,A,5,3 latas chip,3,latas,chip,,,review_required,
+MARTES,B,5,3 latas chip,3,latas,chip,,,review_required,
+MARTES,C,5,3 latas chip,3,latas,chip,,,review_required,
+MARTES,D,5,3 latas chip,3,latas,chip,,,review_required,
+MARTES,E,5,5 latas chip,5,latas,chip,,,review_required,
+MARTES,A,6,6 latas Palmerita ,6,latas,palmerita,,,review_required,
+MARTES,B,6,6 latas Palmerita ,6,latas,palmerita,,,review_required,
+MARTES,C,6,6 latas Palmerita ,6,latas,palmerita,,,review_required,
+MARTES,D,6,6 latas Palmerita ,6,latas,palmerita,,,review_required,
+MARTES,E,6,7 latas Palmerita ,7,latas,palmerita,,,review_required,
+MARTES,A,7,10 latas trencitas ,10,latas,trencitas,,,review_required,
+MARTES,B,7,10 latas trencitas ,10,latas,trencitas,,,review_required,
+MARTES,C,7,10 latas trencitas ,10,latas,trencitas,,,review_required,
+MARTES,D,7,10 latas trencitas ,10,latas,trencitas,,,review_required,
+MARTES,E,7,15 latas trencitas ,15,latas,trencitas,,,review_required,
+MARTES,A,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MARTES,B,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MARTES,C,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MARTES,D,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MARTES,E,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MARTES,A,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MARTES,B,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MARTES,C,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MARTES,D,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MARTES,E,9,15 medialunas saladas  ,15,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MARTES,A,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MARTES,B,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MARTES,C,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MARTES,D,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MARTES,E,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MARTES,A,11,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+MARTES,B,11,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+MARTES,C,11,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+MARTES,D,11,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+MARTES,E,11,1 carro de miga entero ,1,carro,miga entero,,,review_required,
+MARTES,A,12,3 medialunas rellenas   ,3,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+MARTES,B,12,4 medialunas rellenas   ,4,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+MARTES,C,12,3 medialunas rellenas   ,3,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+MARTES,D,12,3 medialunas rellenas   ,3,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+MARTES,E,12,4 medialunas rellenas   ,4,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+MARTES,A,13,1 carro pan lactal,1,carro,pan lactal,,,review_required,
+MARTES,B,13,1/2 carro hamburguesas  ,0.5,carro,hamburguesas,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+MARTES,C,13,1/2 carro hamburguesas ,0.5,carro,hamburguesas,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+MARTES,D,13,1 carro pan lactal,1,carro,pan lactal,,,review_required,
+MARTES,E,13,1/2 carro hamburguesas  ,0.5,carro,hamburguesas,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+MARTES,A,14,1 carro prepizzas ,1,carro,prepizzas,,,review_required,
+MARTES,B,14,1 carro prepizzas ,1,carro,prepizzas,,,review_required,
+MARTES,C,14,1 carro pan lactal integral ,1,carro,pan lactal integral,,,review_required,
+MARTES,E,14,Pan salvado para hacer tostada,,,pan salvado para hacer tostada,,,review_required,no numeric quantity in source text; no unit in source text (no quantity found either)
+MARTES,C,15,1 carro prepizzas ,1,carro,prepizzas,,,review_required,
+MIÉRCOLES,A,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+MIÉRCOLES,B,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+MIÉRCOLES,C,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+MIÉRCOLES,D,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+MIÉRCOLES,A,3,2 bolsa Chipacitos ,2,bolsa,chipacitos,,,review_required,
+MIÉRCOLES,B,3,2 bolsa Chipacitos ,2,bolsa,chipacitos,,,review_required,
+MIÉRCOLES,C,3,2 bolsa Chipacitos ,2,bolsa,chipacitos,,,review_required,
+MIÉRCOLES,D,3,2 bolsa Chipacitos ,2,bolsa,chipacitos,,,review_required,
+MIÉRCOLES,A,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MIÉRCOLES,B,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MIÉRCOLES,C,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MIÉRCOLES,D,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+MIÉRCOLES,A,5,5 latas chip,5,latas,chip,,,review_required,
+MIÉRCOLES,B,5,5 latas chip,5,latas,chip,,,review_required,
+MIÉRCOLES,C,5,5 latas chip,5,latas,chip,,,review_required,
+MIÉRCOLES,D,5,5 latas chip,5,latas,chip,,,review_required,
+MIÉRCOLES,A,6,5 latas Palmerita ,5,latas,palmerita,,,review_required,
+MIÉRCOLES,B,6,5 latas Palmerita ,5,latas,palmerita,,,review_required,
+MIÉRCOLES,C,6,5 latas Palmerita ,5,latas,palmerita,,,review_required,
+MIÉRCOLES,D,6,5 latas Palmerita ,5,latas,palmerita,,,review_required,
+MIÉRCOLES,A,7,10 latas trencitas ,10,latas,trencitas,,,review_required,
+MIÉRCOLES,B,7,10 latas trencitas ,10,latas,trencitas,,,review_required,
+MIÉRCOLES,C,7,10 latas trencitas ,10,latas,trencitas,,,review_required,
+MIÉRCOLES,D,7,10 latas trencitas ,10,latas,trencitas,,,review_required,
+MIÉRCOLES,A,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MIÉRCOLES,B,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MIÉRCOLES,C,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MIÉRCOLES,D,8,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+MIÉRCOLES,A,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MIÉRCOLES,B,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MIÉRCOLES,C,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MIÉRCOLES,D,9,10 medialunas saladas  ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+MIÉRCOLES,A,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MIÉRCOLES,B,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MIÉRCOLES,C,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MIÉRCOLES,D,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+MIÉRCOLES,A,11,1 carro miga entero  ,1,carro,miga entero,,,review_required,
+MIÉRCOLES,B,11,1 carro miga entero  ,1,carro,miga entero,,,review_required,
+MIÉRCOLES,C,11,1 carro miga entero ,1,carro,miga entero,,,review_required,
+MIÉRCOLES,D,11,1 carro miga entero ,1,carro,miga entero,,,review_required,
+MIÉRCOLES,A,12,1 carro de pan lactal ,1,carro,pan lactal,,,review_required,
+MIÉRCOLES,B,12,1 carro de pan lactal ,1,carro,pan lactal,,,review_required,
+MIÉRCOLES,C,12,1 carro de pan lactal de salvado ,1,carro,pan lactal de salvado,,,review_required,
+MIÉRCOLES,D,12,1/2 carro pan hamburguesa ,0.5,carro,pan hamburguesa,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+MIÉRCOLES,A,13,1 carro prepizzas ,1,carro,prepizzas,,,review_required,
+MIÉRCOLES,B,13,Pan salvado para hacer tostada ,,,pan salvado para hacer tostada,,,review_required,no numeric quantity in source text; no unit in source text (no quantity found either)
+MIÉRCOLES,C,13,1 carro de pan lactal ,1,carro,pan lactal,,,review_required,
+MIÉRCOLES,D,13,1/2 carro de pan salvado para hacer tostadas ,0.5,carro,pan salvado para hacer tostadas,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+JUEVES,A,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+JUEVES,B,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+JUEVES,C,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+JUEVES,D,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+JUEVES,A,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+JUEVES,B,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+JUEVES,C,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+JUEVES,D,3,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+JUEVES,A,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+JUEVES,B,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+JUEVES,C,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+JUEVES,D,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+JUEVES,A,5,6 latas palmeritas ,6,latas,palmeritas,,,review_required,
+JUEVES,B,5,6 latas palmeritas ,6,latas,palmeritas,,,review_required,
+JUEVES,C,5,6 latas palmeritas ,6,latas,palmeritas,,,review_required,
+JUEVES,D,5,6 latas palmeritas ,6,latas,palmeritas,,,review_required,
+JUEVES,A,6,6 latas chip,6,latas,chip,,,review_required,
+JUEVES,B,6,6 latas chip,6,latas,chip,,,review_required,
+JUEVES,C,6,6 latas chip,6,latas,chip,,,review_required,
+JUEVES,D,6,6 latas chip,6,latas,chip,,,review_required,
+JUEVES,A,7,15 latas trencitas ,15,latas,trencitas,,,review_required,
+JUEVES,B,7,15 latas trencitas ,15,latas,trencitas,,,review_required,
+JUEVES,C,7,15 latas trencitas ,15,latas,trencitas,,,review_required,
+JUEVES,D,7,15 latas trencitas ,15,latas,trencitas,,,review_required,
+JUEVES,A,8,8 medialunas dulces ,8,,medialunas dulces,,,review_required,no recognizable unit after quantity
+JUEVES,B,8,8 medialunas dulces ,8,,medialunas dulces,,,review_required,no recognizable unit after quantity
+JUEVES,C,8,8 medialunas dulces ,8,,medialunas dulces,,,review_required,no recognizable unit after quantity
+JUEVES,D,8,8 medialunas dulces ,8,,medialunas dulces,,,review_required,no recognizable unit after quantity
+JUEVES,A,9,15 medialunas saladas  ,15,,medialunas saladas,,,review_required,no recognizable unit after quantity
+JUEVES,B,9,15 medialunas saladas  ,15,,medialunas saladas,,,review_required,no recognizable unit after quantity
+JUEVES,C,9,15 medialunas saladas  ,15,,medialunas saladas,,,review_required,no recognizable unit after quantity
+JUEVES,D,9,15 medialunas saladas  ,15,,medialunas saladas,,,review_required,no recognizable unit after quantity
+JUEVES,A,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+JUEVES,B,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+JUEVES,C,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+JUEVES,D,10,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+JUEVES,A,11,6 latas trencitas saborizadas ,6,latas,trencitas saborizadas,,,review_required,
+JUEVES,B,11,6 latas trencitas saborizadas ,6,latas,trencitas saborizadas,,,review_required,
+JUEVES,C,11,6 latas trencitas saborizadas ,6,latas,trencitas saborizadas,,,review_required,
+JUEVES,D,11,6 latas trencitas saborizadas ,6,latas,trencitas saborizadas,,,review_required,
+JUEVES,A,12,4 medialunas rellenas  ,4,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+JUEVES,B,12,4 medialunas rellenas  ,4,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+JUEVES,C,12,4 medialunas rellenas  ,4,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+JUEVES,D,12,4 medialunas rellenas  ,4,,medialunas rellenas,,,review_required,no recognizable unit after quantity
+JUEVES,A,13,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+JUEVES,B,13,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+JUEVES,C,13,1 miga entero,1,,miga entero,,,review_required,no recognizable unit after quantity
+JUEVES,D,13,1 miga entero,1,,miga entero,,,review_required,no recognizable unit after quantity
+JUEVES,A,14,10 latas pan árabe ,10,latas,pan árabe,,,review_required,
+JUEVES,B,14,1/2 carro pan lactal integral,0.5,carro,pan lactal integral,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+JUEVES,C,14,1 carro pan lactal integral,1,carro,pan lactal integral,,,review_required,
+JUEVES,D,14,1 carro prepizzas ,1,carro,prepizzas,,,review_required,
+JUEVES,A,15,Un carro de pan para hacer tostadas,1,carro,pan para hacer tostadas,,,review_required,quantity is the word 'Un' (parsed as 1; confirm)
+JUEVES,B,15,10 latas pan árabe ,10,latas,pan árabe,,,review_required,
+JUEVES,C,15,1 carro pan lactal salvado,1,carro,pan lactal salvado,,,review_required,
+JUEVES,D,15,1/2 carro pan lactal integral,0.5,carro,pan lactal integral,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+JUEVES,B,16,Pan salvado para hacer tostada,,,pan salvado para hacer tostada,,,review_required,no numeric quantity in source text; no unit in source text (no quantity found either)
+VIERNES,A,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+VIERNES,B,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+VIERNES,C,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+VIERNES,D,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+VIERNES,A,3,7 palmeritas ,7,,palmeritas,,,review_required,no recognizable unit after quantity
+VIERNES,B,3,7 palmeritas ,7,,palmeritas,,,review_required,no recognizable unit after quantity
+VIERNES,C,3,7 palmeritas ,7,,palmeritas,,,review_required,no recognizable unit after quantity
+VIERNES,D,3,7 palmeritas ,7,,palmeritas,,,review_required,no recognizable unit after quantity
+VIERNES,A,4,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+VIERNES,B,4,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+VIERNES,C,4,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+VIERNES,D,4,1 bolsa Chipacitos ,1,bolsa,chipacitos,,,review_required,
+VIERNES,A,5,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+VIERNES,B,5,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+VIERNES,C,5,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+VIERNES,D,5,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+VIERNES,A,6,4latas medialunas rellenas,4,latas,medialunas rellenas,,,review_required,
+VIERNES,B,6,4latas medialunas rellenas,4,latas,medialunas rellenas,,,review_required,
+VIERNES,C,6,4latas medialunas rellenas,4,latas,medialunas rellenas,,,review_required,
+VIERNES,D,6,4latas medialunas rellenas,4,latas,medialunas rellenas,,,review_required,
+VIERNES,A,7,6 latas trenzas saborizadas  ,6,latas,trenzas saborizadas,,,review_required,
+VIERNES,B,7,6 latas trenzas saborizadas  ,6,latas,trenzas saborizadas,,,review_required,
+VIERNES,C,7,6 latas trenzas saborizadas  ,6,latas,trenzas saborizadas,,,review_required,
+VIERNES,D,7,6 latas trenzas saborizadas  ,6,latas,trenzas saborizadas,,,review_required,
+VIERNES,A,8,6 latas chip,6,latas,chip,,,review_required,
+VIERNES,B,8,6 latas chip,6,latas,chip,,,review_required,
+VIERNES,C,8,6 latas chip,6,latas,chip,,,review_required,
+VIERNES,D,8,6 latas chip,6,latas,chip,,,review_required,
+VIERNES,A,9,25 latas trencitas ,25,latas,trencitas,,,review_required,
+VIERNES,B,9,25 latas trencitas ,25,latas,trencitas,,,review_required,
+VIERNES,C,9,20 latas trencitas ,20,latas,trencitas,,,review_required,
+VIERNES,D,9,20 latas trencitas ,20,latas,trencitas,,,review_required,
+VIERNES,A,10,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+VIERNES,B,10,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+VIERNES,C,10,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+VIERNES,D,10,6 medialunas dulces ,6,,medialunas dulces,,,review_required,no recognizable unit after quantity
+VIERNES,A,11,20 medialunas saladas ,20,,medialunas saladas,,,review_required,no recognizable unit after quantity
+VIERNES,B,11,20 medialunas saladas ,20,,medialunas saladas,,,review_required,no recognizable unit after quantity
+VIERNES,C,11,20 medialunas saladas ,20,,medialunas saladas,,,review_required,no recognizable unit after quantity
+VIERNES,D,11,20 medialunas saladas ,20,,medialunas saladas,,,review_required,no recognizable unit after quantity
+VIERNES,A,12,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+VIERNES,B,12,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+VIERNES,C,12,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+VIERNES,D,12,2 latas pan pebete,2,latas,pan pebete,,,review_required,
+VIERNES,A,13,8 latas pan árabe ,8,latas,pan árabe,,,review_required,
+VIERNES,B,13,8 latas pan árabe ,8,latas,pan árabe,,,review_required,
+VIERNES,C,13,8 latas pan árabe ,8,latas,pan árabe,,,review_required,
+VIERNES,D,13,8 latas pan árabe ,8,latas,pan árabe,,,review_required,
+VIERNES,A,14,10kg pan pernil,10,kg,pan pernil,,,review_required,
+VIERNES,B,14,10kg pan pernil,10,kg,pan pernil,,,review_required,
+VIERNES,C,14,10kg pan pernil,10,kg,pan pernil,,,review_required,
+VIERNES,D,14,10kg pan pernil,10,kg,pan pernil,,,review_required,
+VIERNES,A,15,1 1/2 carros de prepizzas,1.5,carros,prepizzas,,,review_required,mixed fraction '1 1/2' parsed as 1.5 (§44 unambiguous)
+VIERNES,B,15,2 carros de prepizzas,2,carros,prepizzas,,,review_required,
+VIERNES,C,15,1 1/2  carro prepizzas,1.5,carro,prepizzas,,,review_required,mixed fraction '1 1/2' parsed as 1.5 (§44 unambiguous)
+VIERNES,D,15,1 carro prepizzas,1,carro,prepizzas,,,review_required,
+VIERNES,A,16,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+VIERNES,B,16,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+VIERNES,C,16,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+VIERNES,D,16,1 miga entero ,1,,miga entero,,,review_required,no recognizable unit after quantity
+VIERNES,C,17,1 carro de hamburguesas ,1,carro,hamburguesas,,,review_required,
+VIERNES,D,17,1/2 carro pan lactal de salvado  ,0.5,carro,pan lactal de salvado,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+SÁBADO,A,2,3 latas cara sucia,3,latas,cara sucia,,,review_required,
+SÁBADO,B,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+SÁBADO,C,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+SÁBADO,D,2,2 latas cara sucia,2,latas,cara sucia,,,review_required,
+SÁBADO,A,3,2 bolsa Chipacitos ,2,bolsa,chipacitos,,,review_required,
+SÁBADO,B,3,2 bolsa Chipacitos ,2,bolsa,chipacitos,,,review_required,
+SÁBADO,C,3,2 bolsa Chipacitos ,2,bolsa,chipacitos,,,review_required,
+SÁBADO,D,3,2 bolsa Chipacitos ,2,bolsa,chipacitos,,,review_required,
+SÁBADO,A,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+SÁBADO,B,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+SÁBADO,C,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+SÁBADO,D,4,4 latas baguette ,4,latas,baguette,ddf2c5c2-7ab6-4532-93b9-824d84ab59c2,morning,ready,
+SÁBADO,A,5,8 latas chip,8,latas,chip,,,review_required,
+SÁBADO,B,5,8 latas chip,8,latas,chip,,,review_required,
+SÁBADO,C,5,8 latas chip,8,latas,chip,,,review_required,
+SÁBADO,D,5,6 latas chip,6,latas,chip,,,review_required,
+SÁBADO,A,6,15 latas trencitas ,15,latas,trencitas,,,review_required,
+SÁBADO,B,6,10 latas trencitas ,10,latas,trencitas,,,review_required,
+SÁBADO,C,6,10 latas trencitas ,10,latas,trencitas,,,review_required,
+SÁBADO,D,6,10 latas trencitas ,10,latas,trencitas,,,review_required,
+SÁBADO,A,7,8 medialunas dulces ,8,,medialunas dulces,,,review_required,no recognizable unit after quantity
+SÁBADO,B,7,8 medialunas dulces ,8,,medialunas dulces,,,review_required,no recognizable unit after quantity
+SÁBADO,C,7,8 medialunas dulces ,8,,medialunas dulces,,,review_required,no recognizable unit after quantity
+SÁBADO,D,7,8 medialunas dulces ,8,,medialunas dulces,,,review_required,no recognizable unit after quantity
+SÁBADO,A,8,15 medialunas saladas ,15,,medialunas saladas,,,review_required,no recognizable unit after quantity
+SÁBADO,B,8,10 medialunas saladas ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+SÁBADO,C,8,15 medialunas saladas ,15,,medialunas saladas,,,review_required,no recognizable unit after quantity
+SÁBADO,D,8,10 medialunas saladas ,10,,medialunas saladas,,,review_required,no recognizable unit after quantity
+SÁBADO,A,9,3 latas pan pebete ,3,latas,pan pebete,,,review_required,
+SÁBADO,B,9,3 latas pan pebete ,3,latas,pan pebete,,,review_required,
+SÁBADO,C,9,3 latas pan pebete ,3,latas,pan pebete,,,review_required,
+SÁBADO,D,9,3 latas pan pebete ,3,latas,pan pebete,,,review_required,
+SÁBADO,A,10,6kg pan pernil,6,kg,pan pernil,,,review_required,
+SÁBADO,B,10,6kg pan pernil,6,kg,pan pernil,,,review_required,
+SÁBADO,C,10,10kg pan pernil,10,kg,pan pernil,,,review_required,
+SÁBADO,D,10,10kg pan pernil,10,kg,pan pernil,,,review_required,
+SÁBADO,A,11,7 latas pan árabe,7,latas,pan árabe,,,review_required,
+SÁBADO,B,11,7 latas pan árabe,7,latas,pan árabe,,,review_required,
+SÁBADO,C,11,8 latas pan árabe,8,latas,pan árabe,,,review_required,
+SÁBADO,D,11,8 latas pan árabe,8,latas,pan árabe,,,review_required,
+SÁBADO,B,12,1/2 carro pan lactal salvado,0.5,carro,pan lactal salvado,,,review_required,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+SÁBADO,A,15,3 latas dobladillos de membrillo y batata,3,latas,dobladillos de membrillo y batata,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,15,2 latas dobladillos de membrillo y batata ,2,latas,dobladillos de membrillo y batata,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,15,4 latas hojaldré (membrillo y crema),4,latas,hojaldré (membrillo y crema),,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,15,4 latas hojaldré (membrillo y crema),4,latas,hojaldré (membrillo y crema),,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,16,3 latas facturas hojaldradas  ,3,latas,facturas hojaldradas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,16,7 latas trencitas ,7,latas,trencitas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,16,4 latas dobladillos de membrillo y batata ,4,latas,dobladillos de membrillo y batata,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,16,4 latas dobladillos de membrillo y batata ,4,latas,dobladillos de membrillo y batata,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,17,10 latas trencitas ,10,latas,trencitas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,17,7 latas medialunas ,7,latas,medialunas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,17,15 latas trencitas ,15,latas,trencitas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,17,15 latas trencitas ,15,latas,trencitas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,18,7 latas medialunas ,7,latas,medialunas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,18,5 latas chicharrón ,5,latas,chicharrón,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,18,15 latas medialunas ,15,latas,medialunas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,18,15 latas medialunas ,15,latas,medialunas,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,19,7 latas chicharrón ,7,latas,chicharrón,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,19,2 carros pan,2,carros,pan,,,review_required,"'pan' alone is too generic to match a product; PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,19,7 latas chicharrón ,7,latas,chicharrón,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,19,7 latas chicharrón ,7,latas,chicharrón,,,review_required,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,20,3 carros pan,3,carros,pan,,,review_required,"'pan' alone is too generic to match a product; PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,20,3 carros pan,3,carros,pan,,,review_required,"'pan' alone is too generic to match a product; PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,20,3 carros pan,3,carros,pan,,,review_required,"'pan' alone is too generic to match a product; PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"

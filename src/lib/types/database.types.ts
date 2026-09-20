@@ -191,6 +191,134 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_production_selection_items: {
+        Row: {
+          created_at: string
+          daily_selection_id: string
+          id: string
+          is_selected: boolean
+          product_id: string
+          production_request_id: string | null
+          quantity: number
+          shift_code: string
+          sort_order: number
+          source_suggestion_item_id: string | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          daily_selection_id: string
+          id?: string
+          is_selected?: boolean
+          product_id: string
+          production_request_id?: string | null
+          quantity: number
+          shift_code: string
+          sort_order?: number
+          source_suggestion_item_id?: string | null
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          daily_selection_id?: string
+          id?: string
+          is_selected?: boolean
+          product_id?: string
+          production_request_id?: string | null
+          quantity?: number
+          shift_code?: string
+          sort_order?: number
+          source_suggestion_item_id?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_production_selection_items_daily_selection_id_fkey"
+            columns: ["daily_selection_id"]
+            isOneToOne: false
+            referencedRelation: "daily_production_selections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_production_selection_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_production_selection_items_production_request_id_fkey"
+            columns: ["production_request_id"]
+            isOneToOne: false
+            referencedRelation: "production_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_production_selection_items_source_suggestion_item_id_fkey"
+            columns: ["source_suggestion_item_id"]
+            isOneToOne: false
+            referencedRelation: "production_suggestion_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_production_selections: {
+        Row: {
+          confirmed_at: string | null
+          confirmed_by: string | null
+          id: string
+          production_day_id: string
+          selected_at: string
+          selected_by: string
+          status: string
+          suggestion_id: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          id?: string
+          production_day_id: string
+          selected_at: string
+          selected_by: string
+          status: string
+          suggestion_id: string
+          updated_at: string
+          updated_by: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          id?: string
+          production_day_id?: string
+          selected_at?: string
+          selected_by?: string
+          status?: string
+          suggestion_id?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_production_selections_production_day_id_fkey"
+            columns: ["production_day_id"]
+            isOneToOne: true
+            referencedRelation: "production_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_production_selections_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "production_suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       external_order_items: {
         Row: {
           created_at: string
@@ -590,6 +718,93 @@ export type Database = {
           },
         ]
       }
+      production_suggestion_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          product_id: string
+          shift_code: string
+          sort_order: number
+          source_text: string | null
+          suggested_quantity: number
+          suggestion_id: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          product_id: string
+          shift_code: string
+          sort_order?: number
+          source_text?: string | null
+          suggested_quantity: number
+          suggestion_id: string
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          product_id?: string
+          shift_code?: string
+          sort_order?: number
+          source_text?: string | null
+          suggested_quantity?: number
+          suggestion_id?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_suggestion_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_suggestion_items_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "production_suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      production_suggestions: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          id: string
+          sort_order: number
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          id?: string
+          sort_order?: number
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          id?: string
+          sort_order?: number
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           active: boolean
@@ -944,6 +1159,10 @@ export type Database = {
         }
         Returns: string
       }
+      choose_daily_production_suggestion: {
+        Args: { p_production_day_id: string; p_suggestion_id: string }
+        Returns: Json
+      }
       complete_multi_output_batch: {
         Args: { p_batch_id: string; p_outputs: Json }
         Returns: undefined
@@ -952,6 +1171,7 @@ export type Database = {
         Args: { p_actual_quantity: number; p_batch_id: string; p_unit: string }
         Returns: undefined
       }
+      confirm_daily_production: { Args: never; Returns: Json }
       create_additional_production_request: {
         Args: {
           p_product_id: string
@@ -1012,6 +1232,11 @@ export type Database = {
         Args: { p_production_day_id: string; p_shift_code: string }
         Returns: string
       }
+      reconcile_daily_production_selection: {
+        Args: { p_day_id: string; p_selection_id: string; p_user_id: string }
+        Returns: Json
+      }
+      seed_v6_suggestion_templates: { Args: { p_items: Json }; Returns: Json }
       set_brand_active: {
         Args: { p_active: boolean; p_id: string }
         Returns: string
@@ -1041,6 +1266,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      toggle_daily_selection_item: {
+        Args: { p_item_id: string }
+        Returns: Json
       }
       update_brand: { Args: { p_id: string; p_name: string }; Returns: string }
       update_product: {

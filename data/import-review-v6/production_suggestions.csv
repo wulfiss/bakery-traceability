@@ -1,0 +1,26 @@
+﻿source_sheet,weekday,suggestion_code,status,notes
+LUNES,1,A,review_required,12 item cells; 1 ready; 11 review_required
+LUNES,1,B,review_required,12 item cells; 1 ready; 11 review_required
+LUNES,1,C,review_required,12 item cells; 1 ready; 11 review_required
+LUNES,1,D,review_required,12 item cells; 1 ready; 11 review_required
+MARTES,2,A,review_required,13 item cells; 1 ready; 12 review_required
+MARTES,2,B,review_required,13 item cells; 1 ready; 12 review_required
+MARTES,2,C,review_required,14 item cells; 1 ready; 13 review_required
+MARTES,2,D,review_required,12 item cells; 1 ready; 11 review_required
+MARTES,2,E,review_required,13 item cells; 1 ready; 12 review_required
+MIÉRCOLES,3,A,review_required,12 item cells; 1 ready; 11 review_required
+MIÉRCOLES,3,B,review_required,12 item cells; 1 ready; 11 review_required
+MIÉRCOLES,3,C,review_required,12 item cells; 1 ready; 11 review_required
+MIÉRCOLES,3,D,review_required,12 item cells; 1 ready; 11 review_required
+JUEVES,4,A,review_required,14 item cells; 1 ready; 13 review_required
+JUEVES,4,B,review_required,15 item cells; 1 ready; 14 review_required
+JUEVES,4,C,review_required,14 item cells; 1 ready; 13 review_required
+JUEVES,4,D,review_required,14 item cells; 1 ready; 13 review_required
+VIERNES,5,A,review_required,15 item cells; 1 ready; 14 review_required
+VIERNES,5,B,review_required,15 item cells; 1 ready; 14 review_required
+VIERNES,5,C,review_required,16 item cells; 1 ready; 15 review_required
+VIERNES,5,D,review_required,16 item cells; 1 ready; 15 review_required
+SÁBADO,6,A,review_required,"16 item cells; 1 ready; 15 review_required; rows 15-20 are under PARA LA TARDE (not inferable, §46)"
+SÁBADO,6,B,review_required,"16 item cells; 1 ready; 15 review_required; rows 15-20 are under PARA LA TARDE (not inferable, §46)"
+SÁBADO,6,C,review_required,"16 item cells; 1 ready; 15 review_required; rows 15-20 are under PARA LA TARDE (not inferable, §46)"
+SÁBADO,6,D,review_required,"16 item cells; 1 ready; 15 review_required; rows 15-20 are under PARA LA TARDE (not inferable, §46)"

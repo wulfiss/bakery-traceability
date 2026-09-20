@@ -1,0 +1,168 @@
+payload items: 241 (of 344 review rows)
+
+counts by weekday / suggestion (source_row order preserved):
+  weekday 1 code A: 9 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 13)
+  weekday 1 code B: 9 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 13)
+  weekday 1 code C: 9 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 13)
+  weekday 1 code D: 9 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 13)
+  weekday 2 code A: 9 items  (rows 2, 3, 4, 5, 6, 7, 10, 13, 14)
+  weekday 2 code B: 9 items  (rows 2, 3, 4, 5, 6, 7, 10, 13, 14)
+  weekday 2 code C: 10 items  (rows 2, 3, 4, 5, 6, 7, 10, 13, 14, 15)
+  weekday 2 code D: 8 items  (rows 2, 3, 4, 5, 6, 7, 10, 13)
+  weekday 2 code E: 10 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 13, 14)
+  weekday 3 code A: 10 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 12, 13)
+  weekday 3 code B: 10 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 12, 13)
+  weekday 3 code C: 10 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 12, 13)
+  weekday 3 code D: 10 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 12, 13)
+  weekday 4 code A: 9 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 14)
+  weekday 4 code B: 11 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 14, 15, 16)
+  weekday 4 code C: 10 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 14, 15)
+  weekday 4 code D: 10 items  (rows 2, 3, 4, 5, 6, 7, 10, 11, 14, 15)
+  weekday 5 code A: 11 items  (rows 2, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15)
+  weekday 5 code B: 11 items  (rows 2, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15)
+  weekday 5 code C: 12 items  (rows 2, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 17)
+  weekday 5 code D: 12 items  (rows 2, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 17)
+  weekday 6 code A: 8 items  (rows 2, 3, 4, 5, 6, 9, 10, 11)
+  weekday 6 code B: 9 items  (rows 2, 3, 4, 5, 6, 9, 10, 11, 12)
+  weekday 6 code C: 8 items  (rows 2, 3, 4, 5, 6, 9, 10, 11)
+  weekday 6 code D: 8 items  (rows 2, 3, 4, 5, 6, 9, 10, 11)
+
+products in payload:
+  Baguette (morning): 25 items
+  Cara sucia (morning): 25 items
+  Chip (morning): 25 items
+  Chipacitos (night): 25 items
+  Hamburguesa (night): 5 items
+  Medialunas rellenas (night): 4 items
+  Palmeritas (night): 17 items
+  Pan integral (night): 8 items
+  Pan lactal (night): 13 items
+  Pan miga (night): 5 items
+  Pan pebete (morning): 21 items
+  Pan pernil (night): 8 items
+  Pan salvado (morning): 4 items
+  Pan árabe (night): 10 items
+  Prepizza (night): 13 items
+  Trencitas dulces (night): 33 items
+
+excluded rows by reason:
+  miga_unit x4
+      LUNES A R12: '1 miga '
+      LUNES B R12: '1 miga '
+      LUNES C R12: '1 miga '
+      LUNES D R12: '1 miga '
+  missing_unit x75
+      LUNES A R8: '6 medialunas dulces '
+      LUNES B R8: '6 medialunas dulces '
+      LUNES C R8: '6 medialunas dulces '
+      LUNES D R8: '6 medialunas dulces '
+      LUNES A R9: '10 medialunas saladas  '
+      LUNES B R9: '8 medialunas saladas  '
+      LUNES C R9: '8 medialunas saladas  '
+      LUNES D R9: '8 medialunas saladas  '
+      MARTES A R8: '6 medialunas dulces '
+      MARTES B R8: '6 medialunas dulces '
+      MARTES C R8: '6 medialunas dulces '
+      MARTES D R8: '6 medialunas dulces '
+      MARTES E R8: '6 medialunas dulces '
+      MARTES A R9: '10 medialunas saladas  '
+      MARTES B R9: '10 medialunas saladas  '
+      MARTES C R9: '10 medialunas saladas  '
+      MARTES D R9: '10 medialunas saladas  '
+      MARTES E R9: '15 medialunas saladas  '
+      MARTES A R11: '1 miga entero '
+      MARTES B R11: '1 miga entero '
+      MARTES C R11: '1 miga entero '
+      MARTES D R11: '1 miga entero '
+      MARTES A R12: '3 medialunas rellenas   '
+      MARTES B R12: '4 medialunas rellenas   '
+      MARTES C R12: '3 medialunas rellenas   '
+      MARTES D R12: '3 medialunas rellenas   '
+      MARTES E R12: '4 medialunas rellenas   '
+      MIÉRCOLES A R8: '6 medialunas dulces '
+      MIÉRCOLES B R8: '6 medialunas dulces '
+      MIÉRCOLES C R8: '6 medialunas dulces '
+      MIÉRCOLES D R8: '6 medialunas dulces '
+      MIÉRCOLES A R9: '10 medialunas saladas  '
+      MIÉRCOLES B R9: '10 medialunas saladas  '
+      MIÉRCOLES C R9: '10 medialunas saladas  '
+      MIÉRCOLES D R9: '10 medialunas saladas  '
+      JUEVES A R8: '8 medialunas dulces '
+      JUEVES B R8: '8 medialunas dulces '
+      JUEVES C R8: '8 medialunas dulces '
+      JUEVES D R8: '8 medialunas dulces '
+      JUEVES A R9: '15 medialunas saladas  '
+      JUEVES B R9: '15 medialunas saladas  '
+      JUEVES C R9: '15 medialunas saladas  '
+      JUEVES D R9: '15 medialunas saladas  '
+      JUEVES A R12: '4 medialunas rellenas  '
+      JUEVES B R12: '4 medialunas rellenas  '
+      JUEVES C R12: '4 medialunas rellenas  '
+      JUEVES D R12: '4 medialunas rellenas  '
+      JUEVES A R13: '1 miga entero '
+      JUEVES B R13: '1 miga entero '
+      JUEVES C R13: '1 miga entero'
+      JUEVES D R13: '1 miga entero'
+      VIERNES A R3: '7 palmeritas '
+      VIERNES B R3: '7 palmeritas '
+      VIERNES C R3: '7 palmeritas '
+      VIERNES D R3: '7 palmeritas '
+      VIERNES A R10: '6 medialunas dulces '
+      VIERNES B R10: '6 medialunas dulces '
+      VIERNES C R10: '6 medialunas dulces '
+      VIERNES D R10: '6 medialunas dulces '
+      VIERNES A R11: '20 medialunas saladas '
+  product_not_resolved x1
+      JUEVES A R15: 'Un carro de pan para hacer tostadas'
+  saturday_para_la_tarde x23
+      SÁBADO A R15: '3 latas dobladillos de membrillo y batata'
+      SÁBADO B R15: '2 latas dobladillos de membrillo y batata '
+      SÁBADO C R15: '4 latas hojaldré (membrillo y crema)'
+      SÁBADO D R15: '4 latas hojaldré (membrillo y crema)'
+      SÁBADO A R16: '3 latas facturas hojaldradas  '
+      SÁBADO B R16: '7 latas trencitas '
+      SÁBADO C R16: '4 latas dobladillos de membrillo y batata '
+      SÁBADO D R16: '4 latas dobladillos de membrillo y batata '
+      SÁBADO A R17: '10 latas trencitas '
+      SÁBADO B R17: '7 latas medialunas '
+      SÁBADO C R17: '15 latas trencitas '
+      SÁBADO D R17: '15 latas trencitas '
+      SÁBADO A R18: '7 latas medialunas '
+      SÁBADO B R18: '5 latas chicharrón '
+      SÁBADO C R18: '15 latas medialunas '
+      SÁBADO D R18: '15 latas medialunas '
+      SÁBADO A R19: '7 latas chicharrón '
+      SÁBADO B R19: '2 carros pan'
+      SÁBADO C R19: '7 latas chicharrón '
+      SÁBADO D R19: '7 latas chicharrón '
+      SÁBADO A R20: '3 carros pan'
+      SÁBADO C R20: '3 carros pan'
+      SÁBADO D R20: '3 carros pan'
+
+resolution notes (workbook form -> locked master name):
+  'baguette' -> 'Baguette' (morning) - existing master product (V5 seed)
+  'cara sucia' -> 'Cara sucia' (morning) - locked MAÑANA list
+  'chip' -> 'Chip' (morning) - locked MAÑANA list
+  'chipacitos' -> 'Chipacitos' (night) - locked NOCHE list
+  'hamburguesas' -> 'Hamburguesa' (night) - locked NOCHE list (plural -> locked name)
+  'medialunas dulces' -> 'Medialunas dulces' (night) - locked TARDE->NOCHE list (rows lack a unit)
+  'medialunas rellenas' -> 'Medialunas rellenas' (night) - locked TARDE->NOCHE list
+  'medialunas saladas' -> 'Medialunas saladas' (morning) - locked MAÑANA list (rows lack a unit)
+  'miga' -> 'Pan miga' (night) - locked NOCHE list ('1 miga' has no standard unit)
+  'miga entero' -> 'Pan miga' (night) - locked NOCHE list ('miga entero' -> locked name)
+  'palmerita' -> 'Palmeritas' (night) - locked NOCHE list (spelling variant: singular)
+  'palmeritas' -> 'Palmeritas' (night) - locked NOCHE list
+  'pan hamburguesa' -> 'Hamburguesa' (night) - locked NOCHE list
+  'pan lactal' -> 'Pan lactal' (night) - locked NOCHE list
+  'pan lactal de salvado' -> 'Pan lactal' (night) - locked list ('de salvado' form -> locked name)
+  'pan lactal integral' -> 'Pan integral' (night) - locked list ('pan lactal integral' is the workbook's only integral form)
+  'pan lactal salvado' -> 'Pan lactal' (night) - locked list ('salvado' form -> locked name)
+  'pan pebete' -> 'Pan pebete' (morning) - locked MAÑANA list
+  'pan pernil' -> 'Pan pernil' (night) - locked NOCHE list
+  'pan salvado para hacer tostada' -> 'Pan salvado' (morning) - locked MAÑANA list (singular 'tostada' form; provisional qty 1 / unit carro per user decision 2026-09-16)
+  'pan salvado para hacer tostadas' -> 'Pan salvado' (morning) - locked MAÑANA list (long form -> locked name)
+  'pan árabe' -> 'Pan árabe' (night) - locked NOCHE list
+  'prepizzas' -> 'Prepizza' (night) - locked NOCHE list (plural -> locked name)
+  'trencitas' -> 'Trencitas dulces' (night) - locked TARDE->NOCHE list (bare 'trencitas')
+  'trencitas saborizadas' -> 'Trencitas dulces' (night) - locked list ('saborizadas' -> locked name 'dulces')
+  'trenzas saborizadas' -> 'Trencitas dulces' (night) - locked list ('trenzas' -> locked name 'trencitas')

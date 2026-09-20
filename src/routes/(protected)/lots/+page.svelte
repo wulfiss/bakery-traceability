@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import AdminReturnLink from '$lib/components/AdminReturnLink.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -15,6 +16,7 @@
 
 <main class="page">
 	<h1>Materias primas en uso</h1>
+	<AdminReturnLink role={data.role} />
 
 	{#if data.items.length > 0}
 		<a class="change-lot" href={resolve('/lots/change')}>Cambiar lote actual</a>

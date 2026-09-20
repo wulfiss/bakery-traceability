@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import AdminReturnLink from '$lib/components/AdminReturnLink.svelte';
 	import { preventDoubleSubmit } from '$lib/forms';
 	import { SHIFTS } from '$lib/shifts';
 	import type { ActionData, PageData } from './$types';
@@ -66,6 +67,10 @@
 </script>
 
 <main class="page">
+	<!-- V6.14 (spec §63): quick way back to /admin for supervisor+.
+		Placed above the shift gate so it is visible in both states; the
+		component renders nothing for operators (no /admin area). -->
+	<AdminReturnLink role={data.role} />
 	{#if data.shift === null}
 		<h1>Producción de hoy</h1>
 		<p class="prompt">Elegí el turno que estás trabajando.</p>
@@ -83,6 +88,23 @@
 		</div>
 	{:else}
 		<h1>Producción de hoy</h1>
+
+		<!-- V6.12: the confirmed daily suggestion is the authoritative source
+			of base production. Unconfirmed -> call to action to choose a
+			suggestion; confirmed -> show its code and the review link. -->
+		{#if data.suggestionConfirmed}
+			<div class="suggestion">
+				<p class="suggestion-text">Producción sugerida: {data.suggestionCode}</p>
+				<a class="suggestion-link" href={resolve('/production/suggestions/review')}>
+					REVISAR / CAMBIAR
+				</a>
+			</div>
+		{:else}
+			<div class="suggestion">
+				<p class="suggestion-text">No hay producción sugerida confirmada.</p>
+				<a class="suggestion-link" href={resolve('/production/suggestions')}> ELEGIR PRODUCCIÓN </a>
+			</div>
+		{/if}
 
 		{#if f.error}
 			<div class="error" role="alert">
@@ -294,6 +316,38 @@
 		max-width: var(--content-max);
 		margin: 0 auto;
 		padding: 16px 16px 32px;
+		box-sizing: border-box;
+	}
+
+	/* V6.12: confirmed-suggestion banner (message + action). */
+	.suggestion {
+		margin: 0 0 16px;
+		padding: 14px;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		box-sizing: border-box;
+	}
+
+	.suggestion-text {
+		margin: 0 0 10px;
+		font-weight: 700;
+	}
+
+	.suggestion-link {
+		display: block;
+		width: 100%;
+		min-height: var(--touch-min);
+		padding: 12px;
+		text-align: center;
+		font-size: 1rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: var(--color-primary);
+		background: transparent;
+		border: 1px solid var(--color-primary);
+		border-radius: var(--radius);
+		text-decoration: none;
 		box-sizing: border-box;
 	}
 

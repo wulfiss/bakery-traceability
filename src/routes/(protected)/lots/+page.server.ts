@@ -67,5 +67,9 @@ export const load: PageServerLoad = async (event) => {
 		};
 	});
 
-	return { items };
+	return {
+		items,
+		// V6.14 (spec §63): role for the back-to-Admin link (supervisor+ only).
+		role: event.locals.profileRole ?? null
+	};
 };

@@ -9,6 +9,14 @@
 	const isAdmin = data.role === 'admin';
 
 	const links = [
+		// V6.3: direct access to operational functions (spec §8/§52).
+		// All three of these are shared operational routes, not admin-only
+		// areas, so they stay visible to supervisors too; the hub itself is
+		// already restricted to supervisor+ by the admin layout guard, and
+		// the target routes re-authorize their own role needs.
+		{ label: 'Producción sugerida', href: '/production/suggestions', adminOnly: false },
+		{ label: 'Producción', href: '/production', adminOnly: false },
+		{ label: 'Materias primas', href: '/lots', adminOnly: false },
 		{ label: 'Pedidos externos', href: '/admin/external-orders', adminOnly: false },
 		{ label: 'Materiales', href: '/admin/raw-materials', adminOnly: true },
 		{ label: 'Marcas', href: '/admin/brands', adminOnly: true },

@@ -10,3 +10,4 @@ bun.lockb
 
 # Generated files (do not reformat)
 src/lib/types/database.types.ts
+data/import-review-v6/seed_payload.json

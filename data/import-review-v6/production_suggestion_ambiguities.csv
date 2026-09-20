@@ -1,0 +1,320 @@
+﻿source_sheet,suggestion_code,source_row,source_text,categories,notes
+LUNES,A,2,1 latas cara sucia,unknown_product,
+LUNES,B,2,1 latas cara sucia,unknown_product,
+LUNES,C,2,1 latas cara sucia,unknown_product,
+LUNES,D,2,1 latas cara sucia,unknown_product,
+LUNES,A,3,1 bolsa Chipacitos ,unknown_product,
+LUNES,B,3,1 bolsa Chipacitos ,unknown_product,
+LUNES,C,3,1 bolsa Chipacitos ,unknown_product,
+LUNES,D,3,1 bolsa Chipacitos ,unknown_product,
+LUNES,A,5,6 latas chip,unknown_product,
+LUNES,B,5,6 latas chip,unknown_product,
+LUNES,C,5,6 latas chip,unknown_product,
+LUNES,D,5,6 latas chip,unknown_product,
+LUNES,A,6,7 latas Palmerita ,name_variant:palmerita family;unknown_product,
+LUNES,B,6,7 latas Palmerita ,name_variant:palmerita family;unknown_product,
+LUNES,C,6,7 latas Palmerita ,name_variant:palmerita family;unknown_product,
+LUNES,D,6,7 latas Palmerita ,name_variant:palmerita family;unknown_product,
+LUNES,A,7,5 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+LUNES,B,7,5 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+LUNES,C,7,5 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+LUNES,D,7,5 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+LUNES,A,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+LUNES,B,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+LUNES,C,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+LUNES,D,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+LUNES,A,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+LUNES,B,9,8 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+LUNES,C,9,8 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+LUNES,D,9,8 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+LUNES,A,10,1 carro pan lactal   ,name_variant:pan lactal family;unknown_product,
+LUNES,B,10,1 carro pan lactal salvado ,name_variant:pan lactal family;unknown_product,
+LUNES,C,10,1 carro pan lactal salvado ,name_variant:pan lactal family;unknown_product,
+LUNES,D,10,1 carro pan lactal salvado ,name_variant:pan lactal family;unknown_product,
+LUNES,A,11,1 carro pan lactal integral ,name_variant:pan lactal family;unknown_product,
+LUNES,B,11,1 carro pan lactal integral ,name_variant:pan lactal family;unknown_product,
+LUNES,C,11,1 carro pan lactal integral ,name_variant:pan lactal family;unknown_product,
+LUNES,D,11,1 carro pan lactal integral ,name_variant:pan lactal family;unknown_product,
+LUNES,A,12,1 miga ,miga_unit_variant;name_variant:miga family;unknown_product,'1 miga': 'miga' acts as both unit and product; product = Pan miga (to be created) - §44 review example
+LUNES,B,12,1 miga ,miga_unit_variant;name_variant:miga family;unknown_product,'1 miga': 'miga' acts as both unit and product; product = Pan miga (to be created) - §44 review example
+LUNES,C,12,1 miga ,miga_unit_variant;name_variant:miga family;unknown_product,'1 miga': 'miga' acts as both unit and product; product = Pan miga (to be created) - §44 review example
+LUNES,D,12,1 miga ,miga_unit_variant;name_variant:miga family;unknown_product,'1 miga': 'miga' acts as both unit and product; product = Pan miga (to be created) - §44 review example
+LUNES,A,13,1 carro prepizzas,unknown_product,
+LUNES,B,13,1 carro prepizzas,unknown_product,
+LUNES,C,13,1 carro prepizzas,unknown_product,
+LUNES,D,13,1 carro prepizzas,unknown_product,
+MARTES,A,2,1 latas cara sucia,unknown_product,
+MARTES,B,2,1 latas cara sucia,unknown_product,
+MARTES,C,2,1 latas cara sucia,unknown_product,
+MARTES,D,2,1 latas cara sucia,unknown_product,
+MARTES,E,2,2 latas cara sucia,unknown_product,
+MARTES,A,3,1 bolsa Chipacitos ,unknown_product,
+MARTES,B,3,1 bolsa Chipacitos ,unknown_product,
+MARTES,C,3,1 bolsa Chipacitos ,unknown_product,
+MARTES,D,3,1 bolsa Chipacitos ,unknown_product,
+MARTES,E,3,1 bolsa Chipacitos ,unknown_product,
+MARTES,A,5,3 latas chip,unknown_product,
+MARTES,B,5,3 latas chip,unknown_product,
+MARTES,C,5,3 latas chip,unknown_product,
+MARTES,D,5,3 latas chip,unknown_product,
+MARTES,E,5,5 latas chip,unknown_product,
+MARTES,A,6,6 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MARTES,B,6,6 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MARTES,C,6,6 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MARTES,D,6,6 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MARTES,E,6,7 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MARTES,A,7,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MARTES,B,7,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MARTES,C,7,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MARTES,D,7,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MARTES,E,7,15 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MARTES,A,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,B,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,C,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,D,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,E,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,A,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,B,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,C,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,D,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,E,9,15 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,A,10,2 latas pan pebete,unknown_product,
+MARTES,B,10,2 latas pan pebete,unknown_product,
+MARTES,C,10,2 latas pan pebete,unknown_product,
+MARTES,D,10,2 latas pan pebete,unknown_product,
+MARTES,E,10,2 latas pan pebete,unknown_product,
+MARTES,A,11,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+MARTES,B,11,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+MARTES,C,11,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+MARTES,D,11,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+MARTES,E,11,1 carro de miga entero ,name_variant:miga family;unknown_product,
+MARTES,A,12,3 medialunas rellenas   ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,B,12,4 medialunas rellenas   ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,C,12,3 medialunas rellenas   ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,D,12,3 medialunas rellenas   ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,E,12,4 medialunas rellenas   ,missing_unit;unknown_product,no recognizable unit after quantity
+MARTES,A,13,1 carro pan lactal,name_variant:pan lactal family;unknown_product,
+MARTES,B,13,1/2 carro hamburguesas  ,name_variant:hamburguesa family;unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+MARTES,C,13,1/2 carro hamburguesas ,name_variant:hamburguesa family;unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+MARTES,D,13,1 carro pan lactal,name_variant:pan lactal family;unknown_product,
+MARTES,E,13,1/2 carro hamburguesas  ,name_variant:hamburguesa family;unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+MARTES,A,14,1 carro prepizzas ,unknown_product,
+MARTES,B,14,1 carro prepizzas ,unknown_product,
+MARTES,C,14,1 carro pan lactal integral ,name_variant:pan lactal family;unknown_product,
+MARTES,E,14,Pan salvado para hacer tostada,missing_quantity;missing_unit;unknown_product,no numeric quantity in source text; no unit in source text (no quantity found either)
+MARTES,C,15,1 carro prepizzas ,unknown_product,
+MIÉRCOLES,A,2,2 latas cara sucia,unknown_product,
+MIÉRCOLES,B,2,2 latas cara sucia,unknown_product,
+MIÉRCOLES,C,2,2 latas cara sucia,unknown_product,
+MIÉRCOLES,D,2,2 latas cara sucia,unknown_product,
+MIÉRCOLES,A,3,2 bolsa Chipacitos ,unknown_product,
+MIÉRCOLES,B,3,2 bolsa Chipacitos ,unknown_product,
+MIÉRCOLES,C,3,2 bolsa Chipacitos ,unknown_product,
+MIÉRCOLES,D,3,2 bolsa Chipacitos ,unknown_product,
+MIÉRCOLES,A,5,5 latas chip,unknown_product,
+MIÉRCOLES,B,5,5 latas chip,unknown_product,
+MIÉRCOLES,C,5,5 latas chip,unknown_product,
+MIÉRCOLES,D,5,5 latas chip,unknown_product,
+MIÉRCOLES,A,6,5 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MIÉRCOLES,B,6,5 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MIÉRCOLES,C,6,5 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MIÉRCOLES,D,6,5 latas Palmerita ,name_variant:palmerita family;unknown_product,
+MIÉRCOLES,A,7,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MIÉRCOLES,B,7,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MIÉRCOLES,C,7,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MIÉRCOLES,D,7,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+MIÉRCOLES,A,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MIÉRCOLES,B,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MIÉRCOLES,C,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MIÉRCOLES,D,8,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+MIÉRCOLES,A,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MIÉRCOLES,B,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MIÉRCOLES,C,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MIÉRCOLES,D,9,10 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+MIÉRCOLES,A,10,2 latas pan pebete,unknown_product,
+MIÉRCOLES,B,10,2 latas pan pebete,unknown_product,
+MIÉRCOLES,C,10,2 latas pan pebete,unknown_product,
+MIÉRCOLES,D,10,2 latas pan pebete,unknown_product,
+MIÉRCOLES,A,11,1 carro miga entero  ,name_variant:miga family;unknown_product,
+MIÉRCOLES,B,11,1 carro miga entero  ,name_variant:miga family;unknown_product,
+MIÉRCOLES,C,11,1 carro miga entero ,name_variant:miga family;unknown_product,
+MIÉRCOLES,D,11,1 carro miga entero ,name_variant:miga family;unknown_product,
+MIÉRCOLES,A,12,1 carro de pan lactal ,name_variant:pan lactal family;unknown_product,
+MIÉRCOLES,B,12,1 carro de pan lactal ,name_variant:pan lactal family;unknown_product,
+MIÉRCOLES,C,12,1 carro de pan lactal de salvado ,name_variant:pan lactal family;unknown_product,
+MIÉRCOLES,D,12,1/2 carro pan hamburguesa ,name_variant:hamburguesa family;unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+MIÉRCOLES,A,13,1 carro prepizzas ,unknown_product,
+MIÉRCOLES,B,13,Pan salvado para hacer tostada ,missing_quantity;missing_unit;unknown_product,no numeric quantity in source text; no unit in source text (no quantity found either)
+MIÉRCOLES,C,13,1 carro de pan lactal ,name_variant:pan lactal family;unknown_product,
+MIÉRCOLES,D,13,1/2 carro de pan salvado para hacer tostadas ,unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+JUEVES,A,2,2 latas cara sucia,unknown_product,
+JUEVES,B,2,2 latas cara sucia,unknown_product,
+JUEVES,C,2,2 latas cara sucia,unknown_product,
+JUEVES,D,2,2 latas cara sucia,unknown_product,
+JUEVES,A,3,1 bolsa Chipacitos ,unknown_product,
+JUEVES,B,3,1 bolsa Chipacitos ,unknown_product,
+JUEVES,C,3,1 bolsa Chipacitos ,unknown_product,
+JUEVES,D,3,1 bolsa Chipacitos ,unknown_product,
+JUEVES,A,5,6 latas palmeritas ,name_variant:palmerita family;unknown_product,
+JUEVES,B,5,6 latas palmeritas ,name_variant:palmerita family;unknown_product,
+JUEVES,C,5,6 latas palmeritas ,name_variant:palmerita family;unknown_product,
+JUEVES,D,5,6 latas palmeritas ,name_variant:palmerita family;unknown_product,
+JUEVES,A,6,6 latas chip,unknown_product,
+JUEVES,B,6,6 latas chip,unknown_product,
+JUEVES,C,6,6 latas chip,unknown_product,
+JUEVES,D,6,6 latas chip,unknown_product,
+JUEVES,A,7,15 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+JUEVES,B,7,15 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+JUEVES,C,7,15 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+JUEVES,D,7,15 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+JUEVES,A,8,8 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,B,8,8 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,C,8,8 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,D,8,8 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,A,9,15 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,B,9,15 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,C,9,15 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,D,9,15 medialunas saladas  ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,A,10,2 latas pan pebete,unknown_product,
+JUEVES,B,10,2 latas pan pebete,unknown_product,
+JUEVES,C,10,2 latas pan pebete,unknown_product,
+JUEVES,D,10,2 latas pan pebete,unknown_product,
+JUEVES,A,11,6 latas trencitas saborizadas ,name_variant:trencitas/trenzas family;unknown_product,
+JUEVES,B,11,6 latas trencitas saborizadas ,name_variant:trencitas/trenzas family;unknown_product,
+JUEVES,C,11,6 latas trencitas saborizadas ,name_variant:trencitas/trenzas family;unknown_product,
+JUEVES,D,11,6 latas trencitas saborizadas ,name_variant:trencitas/trenzas family;unknown_product,
+JUEVES,A,12,4 medialunas rellenas  ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,B,12,4 medialunas rellenas  ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,C,12,4 medialunas rellenas  ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,D,12,4 medialunas rellenas  ,missing_unit;unknown_product,no recognizable unit after quantity
+JUEVES,A,13,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+JUEVES,B,13,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+JUEVES,C,13,1 miga entero,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+JUEVES,D,13,1 miga entero,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+JUEVES,A,14,10 latas pan árabe ,unknown_product,
+JUEVES,B,14,1/2 carro pan lactal integral,name_variant:pan lactal family;unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+JUEVES,C,14,1 carro pan lactal integral,name_variant:pan lactal family;unknown_product,
+JUEVES,D,14,1 carro prepizzas ,unknown_product,
+JUEVES,A,15,Un carro de pan para hacer tostadas,word_quantity;unknown_product,quantity is the word 'Un' (parsed as 1; confirm)
+JUEVES,B,15,10 latas pan árabe ,unknown_product,
+JUEVES,C,15,1 carro pan lactal salvado,name_variant:pan lactal family;unknown_product,
+JUEVES,D,15,1/2 carro pan lactal integral,name_variant:pan lactal family;unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+JUEVES,B,16,Pan salvado para hacer tostada,missing_quantity;missing_unit;unknown_product,no numeric quantity in source text; no unit in source text (no quantity found either)
+VIERNES,A,2,2 latas cara sucia,unknown_product,
+VIERNES,B,2,2 latas cara sucia,unknown_product,
+VIERNES,C,2,2 latas cara sucia,unknown_product,
+VIERNES,D,2,2 latas cara sucia,unknown_product,
+VIERNES,A,3,7 palmeritas ,missing_unit;name_variant:palmerita family;unknown_product,no recognizable unit after quantity
+VIERNES,B,3,7 palmeritas ,missing_unit;name_variant:palmerita family;unknown_product,no recognizable unit after quantity
+VIERNES,C,3,7 palmeritas ,missing_unit;name_variant:palmerita family;unknown_product,no recognizable unit after quantity
+VIERNES,D,3,7 palmeritas ,missing_unit;name_variant:palmerita family;unknown_product,no recognizable unit after quantity
+VIERNES,A,4,1 bolsa Chipacitos ,unknown_product,
+VIERNES,B,4,1 bolsa Chipacitos ,unknown_product,
+VIERNES,C,4,1 bolsa Chipacitos ,unknown_product,
+VIERNES,D,4,1 bolsa Chipacitos ,unknown_product,
+VIERNES,A,6,4latas medialunas rellenas,unknown_product,
+VIERNES,B,6,4latas medialunas rellenas,unknown_product,
+VIERNES,C,6,4latas medialunas rellenas,unknown_product,
+VIERNES,D,6,4latas medialunas rellenas,unknown_product,
+VIERNES,A,7,6 latas trenzas saborizadas  ,name_variant:trencitas/trenzas family;unknown_product,
+VIERNES,B,7,6 latas trenzas saborizadas  ,name_variant:trencitas/trenzas family;unknown_product,
+VIERNES,C,7,6 latas trenzas saborizadas  ,name_variant:trencitas/trenzas family;unknown_product,
+VIERNES,D,7,6 latas trenzas saborizadas  ,name_variant:trencitas/trenzas family;unknown_product,
+VIERNES,A,8,6 latas chip,unknown_product,
+VIERNES,B,8,6 latas chip,unknown_product,
+VIERNES,C,8,6 latas chip,unknown_product,
+VIERNES,D,8,6 latas chip,unknown_product,
+VIERNES,A,9,25 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+VIERNES,B,9,25 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+VIERNES,C,9,20 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+VIERNES,D,9,20 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+VIERNES,A,10,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+VIERNES,B,10,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+VIERNES,C,10,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+VIERNES,D,10,6 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+VIERNES,A,11,20 medialunas saladas ,missing_unit;unknown_product,no recognizable unit after quantity
+VIERNES,B,11,20 medialunas saladas ,missing_unit;unknown_product,no recognizable unit after quantity
+VIERNES,C,11,20 medialunas saladas ,missing_unit;unknown_product,no recognizable unit after quantity
+VIERNES,D,11,20 medialunas saladas ,missing_unit;unknown_product,no recognizable unit after quantity
+VIERNES,A,12,2 latas pan pebete,unknown_product,
+VIERNES,B,12,2 latas pan pebete,unknown_product,
+VIERNES,C,12,2 latas pan pebete,unknown_product,
+VIERNES,D,12,2 latas pan pebete,unknown_product,
+VIERNES,A,13,8 latas pan árabe ,unknown_product,
+VIERNES,B,13,8 latas pan árabe ,unknown_product,
+VIERNES,C,13,8 latas pan árabe ,unknown_product,
+VIERNES,D,13,8 latas pan árabe ,unknown_product,
+VIERNES,A,14,10kg pan pernil,unknown_product,
+VIERNES,B,14,10kg pan pernil,unknown_product,
+VIERNES,C,14,10kg pan pernil,unknown_product,
+VIERNES,D,14,10kg pan pernil,unknown_product,
+VIERNES,A,15,1 1/2 carros de prepizzas,unknown_product,mixed fraction '1 1/2' parsed as 1.5 (§44 unambiguous)
+VIERNES,B,15,2 carros de prepizzas,unknown_product,
+VIERNES,C,15,1 1/2  carro prepizzas,unknown_product,mixed fraction '1 1/2' parsed as 1.5 (§44 unambiguous)
+VIERNES,D,15,1 carro prepizzas,unknown_product,
+VIERNES,A,16,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+VIERNES,B,16,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+VIERNES,C,16,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+VIERNES,D,16,1 miga entero ,missing_unit;name_variant:miga family;unknown_product,no recognizable unit after quantity
+VIERNES,C,17,1 carro de hamburguesas ,name_variant:hamburguesa family;unknown_product,
+VIERNES,D,17,1/2 carro pan lactal de salvado  ,name_variant:pan lactal family;unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+SÁBADO,A,2,3 latas cara sucia,unknown_product,
+SÁBADO,B,2,2 latas cara sucia,unknown_product,
+SÁBADO,C,2,2 latas cara sucia,unknown_product,
+SÁBADO,D,2,2 latas cara sucia,unknown_product,
+SÁBADO,A,3,2 bolsa Chipacitos ,unknown_product,
+SÁBADO,B,3,2 bolsa Chipacitos ,unknown_product,
+SÁBADO,C,3,2 bolsa Chipacitos ,unknown_product,
+SÁBADO,D,3,2 bolsa Chipacitos ,unknown_product,
+SÁBADO,A,5,8 latas chip,unknown_product,
+SÁBADO,B,5,8 latas chip,unknown_product,
+SÁBADO,C,5,8 latas chip,unknown_product,
+SÁBADO,D,5,6 latas chip,unknown_product,
+SÁBADO,A,6,15 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+SÁBADO,B,6,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+SÁBADO,C,6,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+SÁBADO,D,6,10 latas trencitas ,name_variant:trencitas/trenzas family;unknown_product,
+SÁBADO,A,7,8 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+SÁBADO,B,7,8 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+SÁBADO,C,7,8 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+SÁBADO,D,7,8 medialunas dulces ,missing_unit;unknown_product,no recognizable unit after quantity
+SÁBADO,A,8,15 medialunas saladas ,missing_unit;unknown_product,no recognizable unit after quantity
+SÁBADO,B,8,10 medialunas saladas ,missing_unit;unknown_product,no recognizable unit after quantity
+SÁBADO,C,8,15 medialunas saladas ,missing_unit;unknown_product,no recognizable unit after quantity
+SÁBADO,D,8,10 medialunas saladas ,missing_unit;unknown_product,no recognizable unit after quantity
+SÁBADO,A,9,3 latas pan pebete ,unknown_product,
+SÁBADO,B,9,3 latas pan pebete ,unknown_product,
+SÁBADO,C,9,3 latas pan pebete ,unknown_product,
+SÁBADO,D,9,3 latas pan pebete ,unknown_product,
+SÁBADO,A,10,6kg pan pernil,unknown_product,
+SÁBADO,B,10,6kg pan pernil,unknown_product,
+SÁBADO,C,10,10kg pan pernil,unknown_product,
+SÁBADO,D,10,10kg pan pernil,unknown_product,
+SÁBADO,A,11,7 latas pan árabe,unknown_product,
+SÁBADO,B,11,7 latas pan árabe,unknown_product,
+SÁBADO,C,11,8 latas pan árabe,unknown_product,
+SÁBADO,D,11,8 latas pan árabe,unknown_product,
+SÁBADO,B,12,1/2 carro pan lactal salvado,name_variant:pan lactal family;unknown_product,fraction '1/2' parsed as 0.5 (§44 unambiguous)
+SÁBADO,A,15,3 latas dobladillos de membrillo y batata,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,15,2 latas dobladillos de membrillo y batata ,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,15,4 latas hojaldré (membrillo y crema),saturday_afternoon;name_variant:hojaldre family;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,15,4 latas hojaldré (membrillo y crema),saturday_afternoon;name_variant:hojaldre family;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,16,3 latas facturas hojaldradas  ,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,16,7 latas trencitas ,saturday_afternoon;name_variant:trencitas/trenzas family;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,16,4 latas dobladillos de membrillo y batata ,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,16,4 latas dobladillos de membrillo y batata ,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,17,10 latas trencitas ,saturday_afternoon;name_variant:trencitas/trenzas family;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,17,7 latas medialunas ,saturday_afternoon;name_variant:medialunas kind;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,17,15 latas trencitas ,saturday_afternoon;name_variant:trencitas/trenzas family;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,17,15 latas trencitas ,saturday_afternoon;name_variant:trencitas/trenzas family;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,18,7 latas medialunas ,saturday_afternoon;name_variant:medialunas kind;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,18,5 latas chicharrón ,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,18,15 latas medialunas ,saturday_afternoon;name_variant:medialunas kind;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,18,15 latas medialunas ,saturday_afternoon;name_variant:medialunas kind;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,19,7 latas chicharrón ,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,B,19,2 carros pan,saturday_afternoon;generic_product;unknown_product,"'pan' alone is too generic to match a product; PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,19,7 latas chicharrón ,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,19,7 latas chicharrón ,saturday_afternoon;unknown_product,"PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,A,20,3 carros pan,saturday_afternoon;generic_product;unknown_product,"'pan' alone is too generic to match a product; PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,C,20,3 carros pan,saturday_afternoon;generic_product;unknown_product,"'pan' alone is too generic to match a product; PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"
+SÁBADO,D,20,3 carros pan,saturday_afternoon;generic_product;unknown_product,"'pan' alone is too generic to match a product; PARA LA TARDE source section: shift_candidate=null, do not infer (§46)"

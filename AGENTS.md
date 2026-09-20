@@ -54,7 +54,9 @@ Non-negotiable rules for every agent working in this repository.
 ## Production sources
 
 - Exactly three internal `source_type` values: `base`, `external_order`, `additional`.
-- `base` comes from the weekly plan (weekday + shift + product + planned quantity).
+- `base` comes from the confirmed daily Suggested Production
+  (see "Suggested Production (V6)"); the legacy weekly-plan generator
+  `ensure_base_production_requests` was deactivated in V6.12 (no-op).
 - `external_order` items carry an assigned shift (defaulted from the product,
   overridable by supervisor/admin).
 - `additional` defaults to the currently selected shift. Since V5.7 the UI no
@@ -65,6 +67,38 @@ Non-negotiable rules for every agent working in this repository.
   `replenishment`, `increased_demand`, `remake`, `other`, and `other` still
   requires a non-empty `reason_note`. For `base` and `external_order`, reason
   fields are null.
+
+## Suggested Production (V6)
+
+- The daily base production derives from **Suggested Production (Producción
+  sugerida)**: per-weekday options A–E stored in `production_suggestions` /
+  `production_suggestion_items` (Monday–Saturday only — no Sunday suggestion is
+  invented; A–D every day, E only on Tuesday). The templates come from the
+  reviewed workbook import (`seed_v6_suggestion_templates`, admin only) — they
+  are never generated automatically.
+- Operator, supervisor and admin may **choose** a suggestion for the day
+  (`choose_daily_production_suggestion`) and **change** it later by choosing
+  again. The choice is stored as a daily selection
+  (`daily_production_selections` + `daily_production_selection_items`),
+  `draft` until `confirm_daily_production` runs.
+- Every suggestion preview shows **products and quantities before selection**:
+  the page data carries every line of every available option (long cards may
+  be collapsed in the UI, but the full contents are available before choosing).
+- Daily check/uncheck (`toggle_daily_selection_item`) changes the **daily
+  snapshot** (`daily_production_selection_items`) only — never the template
+  (`production_suggestion_items`).
+- `confirm_daily_production` generates the day's `base` production requests
+  from the confirmed snapshot. After confirmation, lines tied to already
+  started/completed requests are **locked**: a later change reconciles safely
+  (locked lines are never rewritten; still-pending lines are adjusted or
+  cancelled history-safe; lines of the new option are added) — see V6.13.
+- `external_order` and `additional` requests are **independent** of the
+  Suggested Production flow: choosing or changing a suggestion never touches
+  them.
+- Saturday workbook rows under **PARA LA TARDE** are shift-ambiguous (afternoon
+  is not a template shift), so they never enter templates. They remain flagged
+  in the V6.6 import review (ambiguities CSV) and require an explicit human
+  decision — they are never silently imported as morning/night.
 
 ## Routing
 

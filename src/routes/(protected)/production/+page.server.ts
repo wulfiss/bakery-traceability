@@ -117,9 +117,11 @@ export const load: PageServerLoad = async (event) => {
 	const productionDayId: string | null = dayResult.data;
 	if (!productionDayId) throw dayResult.error ?? new Error('ensure_production_day returned no id');
 
-	// 2. and 3. Ensure base and external-order requests exist (idempotent).
-	// Sequential awaits: Promise.all loses the result types in this
-	// supabase-js version (see AGENTS.md).
+	// 2. Base requests: the legacy weekly-plan generator was DEACTIVATED in
+	// V6.12 (spec §61) — the function is a no-op that keeps its signature and
+	// gates. Base production comes only from the confirmed daily suggestion
+	// (confirm_daily_production, V6.11). The call stays so the page load
+	// keeps the original lock order against the external-order generator.
 	const baseResult = await supabase.rpc('ensure_base_production_requests', {
 		p_production_day_id: productionDayId
 	});
@@ -143,6 +145,39 @@ export const load: PageServerLoad = async (event) => {
 	if (dayRowResult.error) throw dayRowResult.error;
 	const dayRow: ProductionDayLite | null = dayRowResult.data ?? null;
 	const businessDate = dayRow?.production_date ?? '';
+
+	// 6. V6.12 (spec §61): today's suggestion banner state. A selection row
+	// exists once a suggestion was chosen (choose_daily_production_suggestion)
+	// and only counts as confirmed after confirm_daily_production ran; the
+	// banner shows the confirmed suggestion's code (e.g. "Producción
+	// sugerida: B") or the "choose production" call to action otherwise.
+	const selectionResult = await supabase
+		.from('daily_production_selections')
+		.select('status, suggestion_id')
+		.eq('production_day_id', productionDayId)
+		.maybeSingle();
+	if (selectionResult.error) throw selectionResult.error;
+	const selectionRow: Pick<
+		Database['public']['Tables']['daily_production_selections']['Row'],
+		'status' | 'suggestion_id'
+	> | null = selectionResult.data ?? null;
+
+	let suggestionConfirmed = false;
+	let suggestionCode: string | null = null;
+	if (selectionRow && selectionRow.status === 'confirmed') {
+		const suggestionResult = await supabase
+			.from('production_suggestions')
+			.select('code')
+			.eq('id', selectionRow.suggestion_id)
+			.maybeSingle();
+		if (suggestionResult.error) throw suggestionResult.error;
+		const suggestionRowData: Pick<
+			Database['public']['Tables']['production_suggestions']['Row'],
+			'code'
+		> | null = suggestionResult.data ?? null;
+		suggestionConfirmed = true;
+		suggestionCode = suggestionRowData?.code ?? null;
+	}
 
 	// 7. Load ONLY today's requests matching the selected shift.
 	const groups: ProductGroup[] = [];
@@ -386,7 +421,17 @@ export const load: PageServerLoad = async (event) => {
 		};
 	});
 
-	return { shift, groups, progress, businessDate, materials: materialOptions };
+	return {
+		shift,
+		groups,
+		progress,
+		businessDate,
+		materials: materialOptions,
+		suggestionConfirmed,
+		suggestionCode,
+		// V6.14 (spec §63): role for the back-to-Admin link (supervisor+ only).
+		role: event.locals.profileRole ?? null
+	};
 };
 
 export const actions: Actions = {
