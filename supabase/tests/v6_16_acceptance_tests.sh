@@ -48,6 +48,12 @@
 # phase runs inside a single rolled-back transaction before the live flow.
 # A trap cleanup removes everything the suite creates for today.
 #
+# The template rows differ per weekday (Monday options A-D are identical;
+# other weekdays are option-specific). The live-flow expectations of TEST
+# 2-9 are therefore DERIVED at runtime from the active templates of the
+# current business weekday: no weekday-specific quantities, counts or
+# product lines are hardcoded in those checks.
+#
 # Dev credentials (local Docker profiles, fixed for development):
 #   operator@test.local / operator123
 #   supervisor@test.local / supervisor123
@@ -264,6 +270,70 @@ SUG_B=$(sql "select id from production_suggestions where active and weekday = $W
 SUG_C=$(sql "select id from production_suggestions where active and weekday = $WEEKDAY and code = 'C' limit 1;")
 SUG_A=$(sql "select id from production_suggestions where active and weekday = $WEEKDAY and code = 'A' limit 1;")
 
+# ----------------------------------------------- derived template facts
+# Weekday-agnostic expectations for TEST 2-9, derived from the ACTIVE
+# templates of the current business weekday (titems <code> -> FROM/JOIN/
+# WHERE clause for that template's active items, product names included).
+titems() {
+  echo "from production_suggestion_items i join production_suggestions g on g.id = i.suggestion_id join products p on p.id = i.product_id where g.weekday = $WEEKDAY and g.code = '$1' and g.active and i.active"
+}
+N_A=$(sql "select count(*) $(titems A);")
+N_B=$(sql "select count(*) $(titems B);")
+N_C=$(sql "select count(*) $(titems C);")
+N_D=$(sql "select count(*) $(titems D);")
+B_MORNING=$(sql "select count(*) $(titems B) and i.shift_code = 'morning';")
+B_NIGHT=$(sql "select count(*) $(titems B) and i.shift_code = 'night';")
+C_MORNING=$(sql "select count(*) $(titems C) and i.shift_code = 'morning';")
+C_NIGHT=$(sql "select count(*) $(titems C) and i.shift_code = 'night';")
+BAG_IN_A=$(sql "select count(*) $(titems A) and i.product_id = '$BAGUETTE';")
+# The started (locked) Baguette row keeps the quantity it had at start,
+# which is the C-template quantity: the live flow confirms C before the
+# TEST 8 start, and later changes never rewrite in_progress rows.
+BAG_QTY_C=$(sql "select i.suggested_quantity::text $(titems C) and i.product_id = '$BAGUETTE';")
+# Lines created by an earlier choice that option A lacks stay cancelled
+# after the TEST 8 change to A: |(B union C) - A|, derived per weekday.
+N_BC_MINUS_A=$(sql "select count(*) from (select distinct i.product_id $(titems B) union select distinct i.product_id $(titems C)) u where not exists (select 1 from production_suggestion_items i join production_suggestions g on g.id = i.suggestion_id where g.weekday = $WEEKDAY and g.code = 'A' and g.active and i.active and i.product_id = u.product_id);")
+# B-only products (in B template, absent from C): each must end TEST 7 with
+# 0 pending + 1 cancelled. May be empty (e.g. Monday: B and C are identical).
+B_ONLY_PRODUCTS=$(sql "select * from (select distinct i.product_id $(titems B) except select distinct i.product_id $(titems C)) x order by 1;")
+if [ -n "$B_ONLY_PRODUCTS" ]; then
+  B_ONLY_IN=$(printf '%s\n' "$B_ONLY_PRODUCTS" | sed "s/.*/'&'/" | paste -sd, -)
+  T7_CANCEL_EXPECT=$(printf '%s\n' "$B_ONLY_PRODUCTS" | sed 's/.*/0|1/' | paste -sd';' -)
+else
+  B_ONLY_IN=""
+  T7_CANCEL_EXPECT=""
+fi
+# UI line texts "name — qty unit" (first rows per group in sort_order),
+# with the Spanish decimal comma the SSR formatQty produces (0.5 -> 0,5).
+A_FIRST_MORN=$(sql "select p.name || ' — ' || i.suggested_quantity::text || ' ' || i.unit $(titems A) and i.shift_code = 'morning' order by i.sort_order limit 1;")
+A_FIRST_NIGHT=$(sql "select p.name || ' — ' || i.suggested_quantity::text || ' ' || i.unit $(titems A) and i.shift_code = 'night' order by i.sort_order limit 1;")
+B_FIRST_NIGHT=$(sql "select p.name || ' — ' || i.suggested_quantity::text || ' ' || i.unit $(titems B) and i.shift_code = 'night' order by i.sort_order limit 1;")
+C_FIRST_NIGHT=$(sql "select p.name || ' — ' || i.suggested_quantity::text || ' ' || i.unit $(titems C) and i.shift_code = 'night' order by i.sort_order limit 1;")
+C_SECOND_NIGHT=$(sql "select p.name || ' — ' || i.suggested_quantity::text || ' ' || i.unit $(titems C) and i.shift_code = 'night' order by i.sort_order limit 1 offset 1;")
+A_FIRST_MORN=${A_FIRST_MORN//./,}
+A_FIRST_NIGHT=${A_FIRST_NIGHT//./,}
+B_FIRST_NIGHT=${B_FIRST_NIGHT//./,}
+C_FIRST_NIGHT=${C_FIRST_NIGHT//./,}
+C_SECOND_NIGHT=${C_SECOND_NIGHT//./,}
+# Per-product quantity fingerprints, product_id (uuid lexical) ascending.
+B_QTY_UUID=$(sql "select coalesce(string_agg(i.product_id::text || ':' || i.suggested_quantity::text, '|' order by i.product_id, i.shift_code), '') $(titems B);")
+# TEST 8/9 fingerprints keep the locked Baguette quantity (from C) instead
+# of the new template's, because the in_progress row is never rewritten.
+T8_EXPECT_UUID=$(sql "select coalesce(string_agg(i.product_id::text || ':' || (case when i.product_id = '$BAGUETTE' then $BAG_QTY_C::numeric else i.suggested_quantity end)::text, '|' order by i.product_id, i.shift_code), '') $(titems A);")
+T9_EXPECT_UUID=$(sql "select coalesce(string_agg(i.product_id::text || ':' || (case when i.product_id = '$BAGUETTE' then $BAG_QTY_C::numeric else i.suggested_quantity end)::text, '|' order by i.product_id, i.shift_code), '') $(titems B);")
+# card_block <start-marker> <stop-marker> <file> -> the SSR content of the
+# card between the two literal markers (markers excluded). The suggestions
+# page is served minified (the card list is a single line), so the
+# extraction must be character-based, not line-based. A missing stop marker
+# extends the content to the end of the file.
+card_block() {
+  perl -e '
+    local $/; my $h = <STDIN>;
+    my ($start, $stop) = @ARGV;
+    if ($h =~ /\Q$start\E(.*?)(?:\Q$stop\E|\z)/s) { print $1; }
+  ' "$1" "$2" < "$3"
+}
+
 # ================================================================ TEST 1
 echo ""
 echo "== TEST 1: suggestion availability per weekday"
@@ -293,15 +363,36 @@ ck T2 "no selection exists before choosing" "0" \
   "$(sql "select count(*) from daily_production_selections where production_day_id = '$DAY';")"
 SUG_PAGE="$WORK/t2_suggestions.html"
 ck T2 "SSR /production/suggestions (operator, unselected) is 200" "200" "$(get "$WORK/jar_op" /production/suggestions "$SUG_PAGE")"
-contains_ck T2 "preview renders option cards A-D" 'OPCIÓN A' "$SUG_PAGE"
-contains_ck T2 "preview card B shows its full count (9 productos)" '9 productos' "$SUG_PAGE"
-contains_ck T2 "preview card A count (8 productos)" '8 productos' "$SUG_PAGE"
-contains_ck T2 "preview MAÑANA group with product + quantity" 'Cara sucia — 3 latas' "$SUG_PAGE"
-contains_ck T2 "preview A night quantities (Trencitas 15 latas)" 'Trencitas dulces — 15 latas' "$SUG_PAGE"
-contains_ck T2 "preview C night quantities (Pan pernil 10 kg)" 'Pan pernil — 10 kg' "$SUG_PAGE"
-contains_ck T2 "preview C night quantities (Pan árabe 8 latas)" 'Pan árabe — 8 latas' "$SUG_PAGE"
-contains_ck T2 "preview night group header" 'NOCHE' "$SUG_PAGE"
-contains_ck T2 "preview offers to expand full contents (VER TODOS (5) on B night)" 'VER TODOS (5)' "$SUG_PAGE"
+# Per-card checks: each card block runs from its card title to the next
+# card's (the server lists the options in A..E order); the last card (D,
+# except Tuesday) ends at its own choose button, so the expectations hold
+# for whatever the weekday's templates actually contain.
+card_block '>OPCIÓN A</h2>' '>OPCIÓN B</h2>' "$SUG_PAGE" > "$WORK/t2_card_a.html"
+card_block '>OPCIÓN B</h2>' '>OPCIÓN C</h2>' "$SUG_PAGE" > "$WORK/t2_card_b.html"
+card_block '>OPCIÓN C</h2>' '>OPCIÓN D</h2>' "$SUG_PAGE" > "$WORK/t2_card_c.html"
+card_block '>OPCIÓN D</h2>' 'ELEGIR D</button>' "$SUG_PAGE" > "$WORK/t2_card_d.html"
+contains_ck T2 "preview renders option card A" 'OPCIÓN A' "$SUG_PAGE"
+contains_ck T2 "preview renders option card B" 'OPCIÓN B' "$SUG_PAGE"
+contains_ck T2 "preview renders option card C" 'OPCIÓN C' "$SUG_PAGE"
+contains_ck T2 "preview renders option card D" 'OPCIÓN D' "$SUG_PAGE"
+contains_ck T2 "preview card A shows its full count ($N_A productos)" "$N_A productos" "$WORK/t2_card_a.html"
+contains_ck T2 "preview card B shows its full count ($N_B productos)" "$N_B productos" "$WORK/t2_card_b.html"
+contains_ck T2 "preview card C shows its full count ($N_C productos)" "$N_C productos" "$WORK/t2_card_c.html"
+contains_ck T2 "preview card D shows its full count ($N_D productos)" "$N_D productos" "$WORK/t2_card_d.html"
+contains_ck T2 "preview A MAÑANA first line ($A_FIRST_MORN)" "$A_FIRST_MORN" "$WORK/t2_card_a.html"
+contains_ck T2 "preview A NOCHE first line ($A_FIRST_NIGHT)" "$A_FIRST_NIGHT" "$WORK/t2_card_a.html"
+contains_ck T2 "preview B NOCHE first line ($B_FIRST_NIGHT)" "$B_FIRST_NIGHT" "$WORK/t2_card_b.html"
+contains_ck T2 "preview C NOCHE first line ($C_FIRST_NIGHT)" "$C_FIRST_NIGHT" "$WORK/t2_card_c.html"
+if [ -n "$C_SECOND_NIGHT" ]; then
+  contains_ck T2 "preview C NOCHE second line ($C_SECOND_NIGHT)" "$C_SECOND_NIGHT" "$WORK/t2_card_c.html"
+fi
+if [ "$B_NIGHT" -gt 4 ]; then
+  contains_ck T2 "preview offers to expand full contents (B night: VER TODOS ($B_NIGHT))" "VER TODOS ($B_NIGHT)" "$WORK/t2_card_b.html"
+elif [ "$B_MORNING" -le 4 ]; then
+  not_contains_ck T2 "B card has no collapsed group (both B groups have at most 4 lines)" 'VER TODOS' "$WORK/t2_card_b.html"
+fi
+contains_ck T2 "preview shows the MAÑANA group header" 'MAÑANA' "$SUG_PAGE"
+contains_ck T2 "preview shows the NOCHE group header" 'NOCHE' "$SUG_PAGE"
 RESP=$(get_resp "$WORK/jar_op" /production/suggestions/review)
 ck T2 "review page redirects before a selection (no early review)" "303" "$(printf '%s' "$RESP" | cut -d'|' -f1)"
 
@@ -371,7 +462,7 @@ ck T3 "exactly one daily selection" "1" \
   "$(sql "select count(*) from daily_production_selections where production_day_id = '$DAY';")"
 ck T3 "selection is draft on suggestion B, chosen by operator" "draft|B|$OPERATOR" \
   "$(sql "select s.status || '|' || g.code || '|' || s.selected_by from daily_production_selections s join production_suggestions g on g.id = s.suggestion_id where s.production_day_id = '$DAY';")"
-ck T3 "all B items snapshotted and default-selected (9)" "9" \
+ck T3 "all B items snapshotted and default-selected ($N_B)" "$N_B" \
   "$(sql "select count(*) from daily_production_selection_items where daily_selection_id = (select id from daily_production_selections where production_day_id = '$DAY') and is_selected;")"
 
 # ================================================================ TEST 4
@@ -382,7 +473,7 @@ ck T4 "still exactly one daily selection (no admin-only duplicate)" "1" \
   "$(sql "select count(*) from daily_production_selections where production_day_id = '$DAY';")"
 ck T4 "selection now on C, still draft, chooser kept, updated by admin" "draft|C|$OPERATOR|$ADMIN" \
   "$(sql "select s.status || '|' || g.code || '|' || s.selected_by || '|' || s.updated_by from daily_production_selections s join production_suggestions g on g.id = s.suggestion_id where s.production_day_id = '$DAY';")"
-ck T4 "snapshot re-created from C (8 items, all selected)" "8" \
+ck T4 "snapshot re-created from C ($N_C items, all selected)" "$N_C" \
   "$(sql "select count(*) from daily_production_selection_items where daily_selection_id = (select id from daily_production_selections where production_day_id = '$DAY') and is_selected;")"
 ck T4 "no template row was modified by the change (V6 templates untouched)" "0" \
   "$(sql "select count(*) from production_suggestion_items where updated_at > now() - interval '10 minutes';")"
@@ -390,57 +481,91 @@ ck T4 "no template row was modified by the change (V6 templates untouched)" "0" 
 # ================================================================ TEST 5
 echo ""
 echo "== TEST 5: uncheck one pending item, then confirm"
-ITEM_ARABE=$(sql "select i.id from daily_production_selection_items i where i.daily_selection_id = (select id from daily_production_selections where production_day_id = '$DAY') and i.product_id = '$AREPANE';")
-ck T5 "toggle Pan árabe (unchecked) raised no error" "" "$(token_ac "$(jset $OPERATOR) select public.toggle_daily_selection_item('$ITEM_ARABE');")"
+# Deterministic toggle target, derived from the daily snapshot: the last C
+# item (night preferred, by sort_order). Template rows differ per weekday,
+# so no product is hardcoded (Saturday: Pan árabe; Monday: Prepizza).
+ITEM_U=$(sql "select i.id || '|' || i.shift_code || '|' || p.name || '|' || i.product_id
+  from daily_production_selection_items i
+  join daily_production_selections s on s.id = i.daily_selection_id
+  join production_suggestions g on g.id = s.suggestion_id
+  join products p on p.id = i.product_id
+  where s.production_day_id = '$DAY' and g.code = 'C' and i.is_selected and i.shift_code = 'night'
+  order by i.sort_order desc limit 1;")
+if [ -z "$ITEM_U" ]; then
+  # Fallback: the last C item of any shift (a template without night rows).
+  ITEM_U=$(sql "select i.id || '|' || i.shift_code || '|' || p.name || '|' || i.product_id
+    from daily_production_selection_items i
+    join daily_production_selections s on s.id = i.daily_selection_id
+    join production_suggestions g on g.id = s.suggestion_id
+    join products p on p.id = i.product_id
+    where s.production_day_id = '$DAY' and g.code = 'C' and i.is_selected
+    order by i.sort_order desc limit 1;")
+fi
+U_ID=${ITEM_U%%|*}
+_U_REST=${ITEM_U#*|}
+U_SHIFT=${_U_REST%%|*}
+_U_REST=${_U_REST#*|}
+U_NAME=${_U_REST%%|*}
+U_PRODUCT=${_U_REST#*|}
+ck T5 "toggle $U_NAME (unchecked) raised no error" "" "$(token_ac "$(jset $OPERATOR) select public.toggle_daily_selection_item('$U_ID');")"
 # psql -t -A renders booleans as f/t (not false/true).
 ck T5 "item unchecked in the daily snapshot" "f" \
-  "$(sql "select is_selected from daily_production_selection_items where id = '$ITEM_ARABE';")"
+  "$(sql "select is_selected from daily_production_selection_items where id = '$U_ID';")"
 ck T5 "confirm raised no error" "" "$(token_ac "$(jset $OPERATOR) select public.confirm_daily_production();")"
 ck T5 "selection confirmed" "confirmed" \
   "$(sql "select status from daily_production_selections where production_day_id = '$DAY';")"
-ck T5 "7 base pending requests (C minus unchecked Pan árabe)" "7" \
+ck T5 "base pending requests: C minus unchecked $U_NAME ($((N_C - 1)))" "$((N_C - 1))" \
   "$(sql "select count(*) from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending';")"
-ck T5 "unchecked Pan árabe absent from base production" "0" \
-  "$(sql "select count(*) from production_requests where production_day_id = '$DAY' and source_type = 'base' and product_id = '$AREPANE';")"
-# Query order is shift_code, product_id (uuid lexical): morning CUCIA,
-# PEBETE, CHIP, BAGUETTE -> 2|3|8|4; night PERNIL, TRENCITAS, CHIPACITOS -> 10|10|2.
-ck T5 "checked items present with template quantities" \
-  "2|3|8|4|10|10|2" \
-  "$(sql "select coalesce(string_agg(r.requested_quantity::text, '|' order by r.shift_code, r.product_id), '') from production_requests r where r.production_day_id = '$DAY' and r.source_type = 'base' and r.status = 'pending' and r.product_id in ('$CUCIA','$BAGUETTE','$CHIP','$PEBETE','$CHIPACITOS','$TRENCITAS','$PERNIL') and r.product_id <> '$CUCIA' or (r.product_id = '$CUCIA');")"
-# product_id (uuid) ascending: PERNIL, CUCIA, TRENCITAS, CHIPACITOS, PEBETE, CHIP, BAGUETTE.
-ck T5 "per-product quantities match C" \
-  "$PERNIL:10|$CUCIA:2|$TRENCITAS:10|$CHIPACITOS:2|$PEBETE:3|$CHIP:8|$BAGUETTE:4" \
-  "$(sql "select product_id::text || ':' || requested_quantity::text from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending' order by product_id;" | tr '\n' '|' | sed 's/|$//')"
+ck T5 "unchecked $U_NAME absent from base production" "0" \
+  "$(sql "select count(*) from production_requests where production_day_id = '$DAY' and source_type = 'base' and product_id = '$U_PRODUCT';")"
+# Expectation derived from the C template minus the unchecked item, in the
+# same (shift_code, product_id) order the confirm step generates the rows in.
+T5_EXPECT_SHIFT=$(sql "select coalesce(string_agg(i.suggested_quantity::text, '|' order by i.shift_code, i.product_id), '') $(titems C) and i.product_id <> '$U_PRODUCT';")
+ck T5 "checked items present with template quantities" "$T5_EXPECT_SHIFT" \
+  "$(sql "select coalesce(string_agg(r.requested_quantity::text, '|' order by r.shift_code, r.product_id), '') from production_requests r where r.production_day_id = '$DAY' and r.source_type = 'base' and r.status = 'pending';")"
+T5_EXPECT_UUID=$(sql "select coalesce(string_agg(i.product_id::text || ':' || i.suggested_quantity::text, '|' order by i.product_id, i.shift_code), '') $(titems C) and i.product_id <> '$U_PRODUCT';")
+ck T5 "per-product quantities match C (minus unchecked)" "$T5_EXPECT_UUID" \
+  "$(sql "select product_id::text || ':' || requested_quantity::text from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending' order by product_id, shift_code;" | tr '\n' '|' | sed 's/|$//')"
 
 # ================================================================ TEST 6
 echo ""
 echo "== TEST 6: MAÑANA / NOCHE views show only their own requests"
-ck T6 "DB: 4 morning pending requests" "4" \
+# The unchecked item reduces only its own shift group (night by
+# construction, morning only via the T5 fallback).
+if [ "$U_SHIFT" = "morning" ]; then M_PEND=$((C_MORNING - 1)); else M_PEND=$C_MORNING; fi
+if [ "$U_SHIFT" = "night" ]; then N_PEND=$((C_NIGHT - 1)); else N_PEND=$C_NIGHT; fi
+ck T6 "DB: $M_PEND morning pending requests" "$M_PEND" \
   "$(sql "select count(*) from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending' and shift_code = 'morning';")"
-ck T6 "DB: 3 night pending requests (unchecked árabe excluded)" "3" \
+ck T6 "DB: $N_PEND night pending requests (unchecked $U_NAME excluded)" "$N_PEND" \
   "$(sql "select count(*) from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending' and shift_code = 'night';")"
 set_shift_cookie "$WORK/jar_op" morning
 M_PAGE="$WORK/t6_morning.html"
 ck T6 "SSR /production (MAÑANA cookie) is 200" "200" "$(get "$WORK/jar_op" /production "$M_PAGE")"
 contains_ck T6 "MAÑANA view shows Turno: MAÑANA" 'Turno: MAÑANA' "$M_PAGE"
-# The h2 carries a Svelte scoped class (e.g. "group-name svelte-1beqb4y"),
-# so match the stable fragment '>NAME</h2>' instead of the full class list.
-contains_ck T6 "MAÑANA view lists Cara sucia" '>Cara sucia</h2>' "$M_PAGE"
-contains_ck T6 "MAÑANA view lists Baguette" '>Baguette</h2>' "$M_PAGE"
-contains_ck T6 "MAÑANA view lists Chip" '>Chip</h2>' "$M_PAGE"
-contains_ck T6 "MAÑANA view lists Pan pebete" '>Pan pebete</h2>' "$M_PAGE"
-not_contains_ck T6 "MAÑANA view has no Chipacitos group" '>Chipacitos</h2>' "$M_PAGE"
-not_contains_ck T6 "MAÑANA view has no Trencitas group" '>Trencitas dulces</h2>' "$M_PAGE"
-not_contains_ck T6 "MAÑANA view has no Pan pernil group" '>Pan pernil</h2>' "$M_PAGE"
 set_shift_cookie "$WORK/jar_op" night
 N_PAGE="$WORK/t6_night.html"
 ck T6 "SSR /production (NOCHE cookie) is 200" "200" "$(get "$WORK/jar_op" /production "$N_PAGE")"
 contains_ck T6 "NOCHE view shows Turno: NOCHE" 'Turno: NOCHE' "$N_PAGE"
-contains_ck T6 "NOCHE view lists Chipacitos" '>Chipacitos</h2>' "$N_PAGE"
-contains_ck T6 "NOCHE view lists Trencitas" '>Trencitas dulces</h2>' "$N_PAGE"
-contains_ck T6 "NOCHE view lists Pan pernil" '>Pan pernil</h2>' "$N_PAGE"
-not_contains_ck T6 "NOCHE view has no Cara sucia group" '>Cara sucia</h2>' "$N_PAGE"
-not_contains_ck T6 "NOCHE view has no Baguette group" '>Baguette</h2>' "$N_PAGE"
+# The h2 carries a Svelte scoped class (e.g. "group-name svelte-1beqb4y"),
+# so match the stable fragment '>NAME</h2>' instead of the full class list.
+# Group lists derived from the C template (minus the unchecked item):
+# every group appears in its own view and in no other.
+while IFS= read -r NAME; do
+  [ -z "$NAME" ] && continue
+  [ "$NAME" = "$U_NAME" ] && [ "$U_SHIFT" = "morning" ] && continue
+  contains_ck T6 "MAÑANA view lists $NAME" ">${NAME}</h2>" "$M_PAGE"
+  not_contains_ck T6 "NOCHE view has no $NAME group" ">${NAME}</h2>" "$N_PAGE"
+done <<EOF
+$(sql "select p.name $(titems C) and i.shift_code = 'morning' order by i.sort_order;")
+EOF
+while IFS= read -r NAME; do
+  [ -z "$NAME" ] && continue
+  [ "$NAME" = "$U_NAME" ] && [ "$U_SHIFT" = "night" ] && continue
+  contains_ck T6 "NOCHE view lists $NAME" ">${NAME}</h2>" "$N_PAGE"
+  not_contains_ck T6 "MAÑANA view has no $NAME group" ">${NAME}</h2>" "$M_PAGE"
+done <<EOF
+$(sql "select p.name $(titems C) and i.shift_code = 'night' order by i.sort_order;")
+EOF
 
 # ================================================================ TEST 7
 echo ""
@@ -448,23 +573,26 @@ echo "== TEST 7: change before any batch starts -> pending fully reconciles"
 ck T7 "change to B (no batches started yet) raised no error" "" "$(token_ac "$(jset $OPERATOR) select public.choose_daily_production_suggestion('$DAY', '$SUG_B');")"
 ck T7 "selection back to draft on B" "draft|B" \
   "$(sql "select s.status || '|' || g.code from daily_production_selections s join production_suggestions g on g.id = s.suggestion_id where s.production_day_id = '$DAY';")"
-ck T7 "pending fully reconciled to B: 9 requests incl. Pan lactal and Pan árabe" "9" \
+ck T7 "pending fully reconciled to B ($N_B requests)" "$N_B" \
   "$(sql "select count(*) from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending';")"
-# product_id (uuid) ascending: PERNIL, CUCIA, TRENCITAS, CHIPACITOS, LACTAL, PEBETE, CHIP, AREPANE, BAGUETTE.
-ck T7 "per-product quantities match B (incl. new lines)" \
-  "$PERNIL:6|$CUCIA:2|$TRENCITAS:10|$CHIPACITOS:2|$LACTAL:0.5|$PEBETE:3|$CHIP:8|$AREPANE:7|$BAGUETTE:4" \
-  "$(sql "select product_id::text || ':' || requested_quantity::text from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending' order by product_id;" | tr '\n' '|' | sed 's/|$//')"
+ck T7 "per-product quantities match B (incl. new lines)" "$B_QTY_UUID" \
+  "$(sql "select product_id::text || ':' || requested_quantity::text from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending' order by product_id, shift_code;" | tr '\n' '|' | sed 's/|$//')"
 ck T7 "change to C raised no error" "" "$(token_ac "$(jset $OPERATOR) select public.choose_daily_production_suggestion('$DAY', '$SUG_C');")"
 ck T7 "re-confirm raised no error" "" "$(token_ac "$(jset $OPERATOR) select public.confirm_daily_production();")"
 ck T7 "selection confirmed again" "confirmed" \
   "$(sql "select status from daily_production_selections where production_day_id = '$DAY';")"
-ck T7 "pending base production matches C: 8 requests" "8" \
+ck T7 "pending base production matches C ($N_C requests)" "$N_C" \
   "$(sql "select count(*) from production_requests where production_day_id = '$DAY' and source_type = 'base' and status = 'pending';")"
-# 0 pending + 1 cancelled: the reconciliation cancelled the row history-safe.
-# (Count filters on status; a plain `and status = 'pending' || '|' || 0` would
-#  parse as a string comparison and always return 0|0.)
-ck T7 "no request left for the C-absent Pan lactal besides a cancelled one" "0|1" \
-  "$(sql "select count(*) filter (where status = 'pending') || '|' || count(*) filter (where status = 'cancelled') from production_requests where production_day_id = '$DAY' and source_type = 'base' and product_id = '$LACTAL';")"
+# 0 pending + 1 cancelled per B-only product: the reconciliation cancelled
+# the rows history-safe. (Count filters on status; a plain
+# `and status = 'pending' || '|' || 0` would parse as a string comparison
+# and always return 0|0.)
+if [ -n "$B_ONLY_PRODUCTS" ]; then
+  T7_CANCEL_ACTUAL=$(sql "select coalesce(string_agg(cnt, ';' order by product_id), '') from (select product_id, count(*) filter (where status = 'pending') || '|' || count(*) filter (where status = 'cancelled') as cnt from production_requests where production_day_id = '$DAY' and source_type = 'base' and product_id in ($B_ONLY_IN) group by product_id) x;")
+  ck T7 "B-only products left only as cancelled rows" "$T7_CANCEL_EXPECT" "$T7_CANCEL_ACTUAL"
+else
+  ck T7 "no B-only products (B and C share the item set): nothing to cancel" "" ""
+fi
 
 # ============================================== TEST 10 fixtures
 # Independent sources created BEFORE the after-start changes: one external
@@ -509,10 +637,11 @@ ck T8 "one in-progress batch created" 1 "$(printf '%s' "$BATCH" | grep -cE '^[0-
 BAG_AFTER_START=$(sql "select row_to_json(t)::text from (select * from production_requests t where t.id = '$BAG_REQ') t;")
 BATCH_CODE=$(sql "select batch_code from production_batches where id = '$BATCH';")
 echo "   (batch code: $BATCH_CODE)"
-ck T8 "batch code format PAN-DDMMYY-M-NNN" 1 "$(printf '%s' "$BATCH_CODE" | grep -cE '^PAN-190926-M-[0-9]{3}$')"
+BATCH_DATE=$(sql "select to_char(production_date, 'DDMMYY') from production_days where id = '$DAY';")
+ck T8 "batch code format PAN-DDMMYY-M-NNN (stored production_date)" 1 "$(printf '%s' "$BATCH_CODE" | grep -cE "^PAN-${BATCH_DATE}-M-[0-9]{3}$")"
 ck T8 "batch started by the operator, shift morning" "$OPERATOR|morning" \
   "$(sql "select started_by || '|' || shift_code from production_batches where id = '$BATCH';")"
-ck T8 "Batchuette request is in_progress, qty 4" "in_progress|4" \
+ck T8 "Baguette request is in_progress with its template quantity" "in_progress|$BAG_QTY_C" \
   "$(sql "select status || '|' || requested_quantity::text from production_requests where id = '$BAG_REQ';")"
 # TEST 14 snapshot S1 (after start + before the after-start change).
 T14_SNAP="$WORK/t14_snap.txt"
@@ -531,15 +660,15 @@ ck T8 "still exactly one Baguette request (no duplicate snapshot row)" "1" \
   "$(sql "select count(*) from production_requests where production_day_id = '$DAY' and product_id = '$BAGUETTE';")"
 ck T8 "batch still in_progress with its material lots intact" "in_progress|$LOTS_AT_START" \
   "$(sql "select status || '|' || count(*) from production_batches b left join batch_materials m on m.batch_id = b.id where b.id = '$BATCH' group by status;")"
-# A has 8 template lines; 7 become/remain pending, Baguette is in_progress
-# (locked), and the C-absent Pan lactal row stays cancelled from TEST 7.
-ck T8 "pending reconciled to A: 7 pending + 1 in_progress + 1 cancelled (lactal)" \
-  "7|1|1" \
+# A has N_A template lines: every non-started line becomes/remains pending,
+# Baguette is in_progress (locked at its start quantity), and the rows
+# created by earlier choices that A lacks stay cancelled: derived per weekday.
+ck T8 "pending reconciled to A: $((N_A - BAG_IN_A)) pending + 1 in_progress + $N_BC_MINUS_A cancelled" \
+  "$((N_A - BAG_IN_A))|1|$N_BC_MINUS_A" \
   "$(sql "select count(*) filter (where status = 'pending') || '|' || count(*) filter (where status = 'in_progress') || '|' || count(*) filter (where status = 'cancelled') from production_requests where production_day_id = '$DAY' and source_type = 'base';")"
-# product_id (uuid) ascending: PERNIL, CUCIA, TRENCITAS, CHIPACITOS, PEBETE, CHIP, AREPANE, BAGUETTE.
-ck T8 "pending quantities match A (pernil 10->6, trencitas 10->15, árabe 8->7, cara 2->3)" \
-  "$PERNIL:6|$CUCIA:3|$TRENCITAS:15|$CHIPACITOS:2|$PEBETE:3|$CHIP:8|$AREPANE:7|$BAGUETTE:4" \
-  "$(sql "select product_id::text || ':' || requested_quantity::text from production_requests where production_day_id = '$DAY' and source_type = 'base' and status in ('pending','in_progress') order by product_id;" | tr '\n' '|' | sed 's/|$//')"
+ck T8 "pending+in_progress quantities match A (started Baguette keeps its locked qty)" \
+  "$T8_EXPECT_UUID" \
+  "$(sql "select product_id::text || ':' || requested_quantity::text from production_requests where production_day_id = '$DAY' and source_type = 'base' and status in ('pending','in_progress') order by product_id, shift_code;" | tr '\n' '|' | sed 's/|$//')"
 ck T8 "selection back to draft on A (awaiting re-confirm)" "draft|A" \
   "$(sql "select s.status || '|' || g.code from daily_production_selections s join production_suggestions g on g.id = s.suggestion_id where s.production_day_id = '$DAY';")"
 
@@ -547,11 +676,12 @@ ck T8 "selection back to draft on A (awaiting re-confirm)" "draft|A" \
 echo ""
 echo "== TEST 9 (live): pending quantities updated, started never rewritten"
 ck T9 "live change A -> B raised no error" "" "$(token_ac "$(jset $OPERATOR) select public.choose_daily_production_suggestion('$DAY', '$SUG_B');")"
-# B has 9 template lines: 8 pending + the locked in_progress Baguette.
-# product_id (uuid) ascending: PERNIL, CUCIA, TRENCITAS, CHIPACITOS, LACTAL, PEBETE, CHIP, AREPANE, BAGUETTE.
-ck T9 "live: pending cara sucia updated 3 -> 2 (B) and trencitas 15 -> 10 (B)" \
-  "$PERNIL:6|$CUCIA:2|$TRENCITAS:10|$CHIPACITOS:2|$LACTAL:0.5|$PEBETE:3|$CHIP:8|$AREPANE:7|$BAGUETTE:4" \
-  "$(sql "select product_id::text || ':' || requested_quantity::text from production_requests where production_day_id = '$DAY' and source_type = 'base' and status in ('pending','in_progress') order by product_id;" | tr '\n' '|' | sed 's/|$//')"
+# B template lines are all pending except the locked in_progress Baguette,
+# which keeps the quantity it had at start (never rewritten): the
+# expectation is the B template with the locked Baguette quantity.
+ck T9 "live: pending+in_progress quantities match B after the change" \
+  "$T9_EXPECT_UUID" \
+  "$(sql "select product_id::text || ':' || requested_quantity::text from production_requests where production_day_id = '$DAY' and source_type = 'base' and status in ('pending','in_progress') order by product_id, shift_code;" | tr '\n' '|' | sed 's/|$//')"
 BAG_AFTER_T9=$(sql "select row_to_json(t)::text from (select * from production_requests t where t.id = '$BAG_REQ') t;")
 ck T9 "live: started Baguette still byte-identical after the second change" 0 \
   "$(printf '%s' "$BAG_AFTER_START" | cmp -s - <(printf '%s' "$BAG_AFTER_T9") && echo 0 || echo 1)"
