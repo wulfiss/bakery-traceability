@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import { preventDoubleSubmit } from '$lib/forms';
 	import type { ActionData, PageData } from './$types';
 
@@ -52,6 +53,9 @@
 </script>
 
 <main class="page">
+	<!-- V6.17: back to the production list, where the other products being
+		manufactured are visible and can be reached. -->
+	<a class="back-link" href={resolve('/production')}>IR A PRODUCCIÓN</a>
 	<h1>{data.productName}</h1>
 
 	<div class="detail">

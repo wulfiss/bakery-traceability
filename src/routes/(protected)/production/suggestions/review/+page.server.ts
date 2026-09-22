@@ -159,7 +159,9 @@ export const actions: Actions = {
 	confirm: async (event) => {
 		const { error } = await event.locals.supabase.rpc('confirm_daily_production');
 		if (error) return fail(400, { error: confirmErrorMessages(error.message) });
-		// Success: the page data refreshes (the selection is confirmed).
+		// V6.17: after confirming, the operator goes back to /production,
+		// where the confirmed day's requests are started.
+		redirect(303, '/production');
 	}
 };
 
