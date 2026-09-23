@@ -93,6 +93,9 @@ export type RequestItem = {
 	quantity: number;
 	unit: string;
 	status: Database['public']['Tables']['production_requests']['Row']['status'];
+	// The in-progress batch covering this request (batch_requests join), or
+	// null when the request has no associated batch.
+	batchId: string | null;
 };
 
 export type ProductGroup = {
@@ -230,6 +233,46 @@ export const load: PageServerLoad = async (event) => {
 			}
 		}
 
+		// Resolve the covering in-progress batch for each in-progress request
+		// through the batch_requests join table (batch_id -> production_batches,
+		// production_request_id -> production_requests), keeping only batches
+		// that are actually in progress. Requests without a batch stay null.
+		const batchByRequest = new Map<string, string>();
+		const inProgressRequestIds = requests
+			.filter((request) => request.status === 'in_progress')
+			.map((request) => request.id);
+		if (inProgressRequestIds.length > 0) {
+			const linksResult = await supabase
+				.from('batch_requests')
+				.select('production_request_id, batch_id')
+				.in('production_request_id', inProgressRequestIds);
+			if (linksResult.error) throw linksResult.error;
+			const links: Pick<
+				Database['public']['Tables']['batch_requests']['Row'],
+				'production_request_id' | 'batch_id'
+			>[] = linksResult.data ?? [];
+			const linkedBatchIds = [...new Set(links.map((link) => link.batch_id))];
+			if (linkedBatchIds.length > 0) {
+				const batchRowsResult = await supabase
+					.from('production_batches')
+					.select('id, status')
+					.in('id', linkedBatchIds);
+				if (batchRowsResult.error) throw batchRowsResult.error;
+				const batchRows: Pick<
+					Database['public']['Tables']['production_batches']['Row'],
+					'id' | 'status'
+				>[] = batchRowsResult.data ?? [];
+				const inProgressBatchIds = new Set(
+					batchRows.filter((batch) => batch.status === 'in_progress').map((batch) => batch.id)
+				);
+				for (const link of links) {
+					if (inProgressBatchIds.has(link.batch_id)) {
+						batchByRequest.set(link.production_request_id, link.batch_id);
+					}
+				}
+			}
+		}
+
 		// Flat list with one entry per request (each stays independently
 		// startable; no allocation or combined-batch logic is introduced).
 		const flat: RequestItem[] = [];
@@ -245,7 +288,8 @@ export const load: PageServerLoad = async (event) => {
 				productName: productNames.get(request.product_id) ?? '—',
 				quantity: request.requested_quantity,
 				unit: request.unit,
-				status: request.status
+				status: request.status,
+				batchId: batchByRequest.get(request.id) ?? null
 			});
 		}
 

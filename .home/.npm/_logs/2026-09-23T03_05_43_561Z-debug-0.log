@@ -1,0 +1,49 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@10.9.3
+2 info using node@v22.19.0
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/srv/agent-workspaces/bakery-traceability/node22/.npmrc
+5 silly config load:file:/srv/agent-workspaces/bakery-traceability/p0-svelte-check/.home/.npmrc
+6 silly config load:file:/srv/agent-workspaces/bakery-traceability/node22/etc/npmrc
+7 verbose title npm install node@22.14.0
+8 verbose argv "install" "--prefix" "/srv/agent-workspaces/bakery-traceability/node22" "--no-save" "node@22.14.0"
+9 verbose logfile logs-max:10 dir:/srv/agent-workspaces/bakery-traceability/p0-svelte-check/.home/.npm/_logs/2026-09-23T03_05_43_561Z-
+10 verbose logfile /srv/agent-workspaces/bakery-traceability/p0-svelte-check/.home/.npm/_logs/2026-09-23T03_05_43_561Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+13 verbose stack Error: EACCES: permission denied, mkdir '/srv/agent-workspaces/bakery-traceability/node22'
+13 verbose stack     at async mkdir (node:internal/fs/promises:860:10)
+13 verbose stack     at async Arborist.reify (/usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:126:7)
+13 verbose stack     at async Install.exec (/usr/local/lib/node_modules/npm/lib/commands/install.js:150:5)
+13 verbose stack     at async Npm.exec (/usr/local/lib/node_modules/npm/lib/npm.js:207:9)
+13 verbose stack     at async module.exports (/usr/local/lib/node_modules/npm/lib/cli/entry.js:74:5)
+14 error code EACCES
+15 error syscall mkdir
+16 error path /srv/agent-workspaces/bakery-traceability/node22
+17 error errno -13
+18 error Error: EACCES: permission denied, mkdir '/srv/agent-workspaces/bakery-traceability/node22'
+18 error     at async mkdir (node:internal/fs/promises:860:10)
+18 error     at async Arborist.reify (/usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:126:7)
+18 error     at async Install.exec (/usr/local/lib/node_modules/npm/lib/commands/install.js:150:5)
+18 error     at async Npm.exec (/usr/local/lib/node_modules/npm/lib/npm.js:207:9)
+18 error     at async module.exports (/usr/local/lib/node_modules/npm/lib/cli/entry.js:74:5) {
+18 error   errno: -13,
+18 error   code: 'EACCES',
+18 error   syscall: 'mkdir',
+18 error   path: '/srv/agent-workspaces/bakery-traceability/node22'
+18 error }
+19 error
+19 error The operation was rejected by your operating system.
+19 error It is likely you do not have the permissions to access this file as the current user
+19 error
+19 error If you believe this might be a permissions issue, please double-check the
+19 error permissions of the file and its containing directories, or try running
+19 error the command again as root/Administrator.
+20 silly unfinished npm timer reify 1790132743710
+21 verbose cwd /srv/agent-workspaces/bakery-traceability/p0-svelte-check
+22 verbose os Linux 7.0.0-31-generic
+23 verbose node v22.19.0
+24 verbose npm  v10.9.3
+25 verbose exit -13
+26 verbose code -13
+27 error A complete log of this run can be found in: /srv/agent-workspaces/bakery-traceability/p0-svelte-check/.home/.npm/_logs/2026-09-23T03_05_43_561Z-debug-0.log

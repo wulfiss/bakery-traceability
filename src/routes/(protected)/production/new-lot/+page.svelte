@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { preventDoubleSubmit } from '$lib/forms';
 	import type { ActionData, PageData } from './$types';
